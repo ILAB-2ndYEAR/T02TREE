@@ -29,6 +29,16 @@ class StatTree
     size_t size_ = 0;
 
 public:
+    class Iterator
+    {
+        Node* ptr_ = nullptr;
+
+        Data getData() const;
+
+        static Iterator end()
+            { return Iterator {nullptr}; }
+    };
+
     size_t size() const { return size_; }
 
    ~StatTree();
@@ -38,27 +48,29 @@ public:
     StatTree( StatTree&& sd ) : size_ (sd.size)
         { std::swap (root_, sd.root_); }
 
-  // Basic methods:
-    bool insert( const Data& );
-    bool contains( const Data& ) const;
+    // TODO [TheRedHotHabanero]:
+    Iterator insert( const Data& );
+    Iterator find( const Data& ) const;
     bool erase( const Data& );
 
-  // Stat methods:
     size_t countLesser( const Data& ) const;
-    Data getLesserOfOrderK( size_t k ) const;
+    Data lesserOfOrderK( size_t k ) const;
 
-  // Verification stuff:
     bool verify() const;
 
     // Bypasses all tree and performs checks / dumps it.
     // Returns 'true' in case of success check (dump) and 'false' otherwise.
-    template<class Callable>
-    bool bypass() const;
+    // TODO [TheRedHotHabanero]:
+    bool bypass( std::function<bool( const Node& )> tester ) const;
 
     // Callables for bypass
-    struct checkTreeStruct { bool operator()( const Node& ); };
-    struct checkSortedOrder { bool operator()( const Node& ); };
-    struct checkColors { bool operator()( const Node& ); };
-    struct checkSubTreesSizes { bool operator()( const Node& ); };
+    static checkTreeStruct( const Node& );
+    // TODO [TheRedHotHabanero]:
+    static checkSortedOrder( const Node& );
+    // TODO [TheRedHotHabanero]:
+    static checkColors( const Node& );
+    static checkSubTreesSizes( const Node& );
+
+    // TODO [TheRedHotHabanero]:
     struct dumpCallable {/* ... use ostream? ...*/};
 };
