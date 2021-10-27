@@ -37,7 +37,8 @@ set( TREE_IMPL_DIR "${CMAKE_SOURCE_DIR}/source/tree-impl" )
 set( TREE_TESTS_DIR "${CMAKE_SOURCE_DIR}/source/tree-tests" )
 set( TREE_E2E_DIR "${CMAKE_SOURCE_DIR}/source/e2e")
 
-target_sources( ${TREE_EXEC_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/source/tree-main.cc" )
+target_sources( ${TREE_EXEC_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/source/tree-main.cc")
+
 target_sources( ${TREE_TEST_NAME} PRIVATE "${TREE_TESTS_DIR}/tests-main.cc" )
 target_sources( ${TREE_E2E_NAME} PRIVATE "${TREE_E2E_DIR}/e2e-main.cc" )
 

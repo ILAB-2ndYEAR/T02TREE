@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include "tree.hh"
 
 int main()
 {
