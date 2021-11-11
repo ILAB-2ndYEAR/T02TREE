@@ -4,6 +4,9 @@
 
 int main()
 {
-    std::cout << "Not implemented yet" << std::endl;
-    return -1;
+
+    tree::StatTree<int> tree {};
+    tree.verify ();
+
+    return 0;
 }

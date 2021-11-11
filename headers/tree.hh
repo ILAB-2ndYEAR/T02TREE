@@ -2,6 +2,7 @@
 #include <utility>
 #include <functional>
 #include <ostream>
+#include <iostream>
 
 #ifndef TREE_HH_INCL
 #define TREE_HH_INCL
@@ -9,7 +10,7 @@
 namespace tree
 {
 
-// RB Tree that provides statistical collection methods.
+// RB Tree that provides stat calc methods with log (n) computational complexity.
 template<class Data, class Compare = std::less<Data>>
 class StatTree
 {
@@ -17,7 +18,6 @@ class StatTree
     {
         // This node attachement side.
         enum class Side { LEFT, RIGHT };
-
         enum class Color { RED, BLACK };
 
         Data data_ {};
@@ -29,13 +29,14 @@ class StatTree
         Side side_ = Side::LEFT;
 
         Color color_ = Color::BLACK;
-        size_t leftSubTreeSize_ = 0;
+        // Left sub tree size.
+        size_t leftSize_ = 0;
 
-        // Debug field
-        static constexpr bool PASS_TOGGLE_INIT_VAL = false;
-        bool passToggle_ = PASS_TOGGLE_INIT_VAL;
+        // Debug fields & methods:
+        bool passToggle_ = false;
+        size_t rightSize_ = 0;
 
-        // Checks if that node were toggled with taken treePassFlag
+        // Checks if that node were toggled with taken treePassToggle
         // value last time and toggles passToggle_ to do such checks in future.
         // Used in verify passes to avoid looping.
         bool passToggle( bool treePassToggle ) noexcept
@@ -47,9 +48,6 @@ class StatTree
 
     Node* root_ = nullptr;
     size_t size_ = 0;
-
-    // Debug field. Used for nodes toggling.
-    bool passToggle_ = Node::PASS_TOGGLE_INIT_VAL;
 
 public:
     class Iterator
@@ -69,12 +67,15 @@ public:
     size_t size() const noexcept
         { return size_; }
 
-   ~StatTree();
-    StatTree( const StatTree& );
-    StatTree operator=( const StatTree& );
-    StatTree operator=( StatTree&& sd );
-    StatTree( StatTree&& sd ) : size_ (sd.size), root_ (sd.root_)
-        { sd.root_ = nullptr; }
+    StatTree() = default;
+
+    // Will implement later:
+   ~StatTree() = default;
+
+    StatTree( const StatTree& ) = delete;
+    StatTree operator=( const StatTree& ) = delete;
+    StatTree operator=( StatTree&& sd ) = delete;
+    StatTree( StatTree&& sd ) = delete;
 
     // TODO [TheRedHotHabanero]:
     Iterator insert( const Data& );
@@ -84,26 +85,60 @@ public:
     size_t countLesser( const Data& ) const;
     Data lesserOfOrderK( size_t k ) const;
 
+    // Calles bypass for all types of checks.
     bool verify() const;
 
-    // Bypasses all tree and performs checks / dumps it.
+private:
+    // Bypasses all tree and calls tester (curNode) for all nodes.
     // Returns 'true' in case of success check (dump) and 'false' otherwise.
-    // TODO [TheRedHotHabanero]:
-    using Tester = std::function<bool( const Node& )>;
-    bool bypass( Tester tester ) const;
+    template<class Tester>
+    bool bypass() const;
+
+    // Used by StructTester to avoid looping.
+    bool toggleValue() const noexcept
+    {
+        if (root_ != nullptr)
+            return root_->passToggle_;
+        return false;
+    }
 
     // Callables for bypass
-    static bool checkTreeStruct( const Node& );
-    // TODO [TheRedHotHabanero]:
-    static bool checkSortedOrder( const Node& );
-    // TODO [TheRedHotHabanero]:
-    static bool checkColors( const Node& );
-    static bool checkSubTreesSizes( const Node& );
+    // Checks that StatTree have binary tree structure.
+    struct StructTester
+    {
+        const size_t treeSize_;
+        const bool passToggle_;
+        size_t passedNum_ = 0;
+
+        StructTester( const StatTree& tree ) :
+            treeSize_ {tree.size ()}, passToggle_ {tree.toggleValue ()} {}
+
+        bool operator ()( Node* ) noexcept;
+    };
+
+    // Checks that all sizes are counted correctly.
+    struct SizesTester
+    {
+        bool rootPassed_ = false;
+        const size_t treeSize_;
+
+        SizesTester( const StatTree& tree ) :
+            treeSize_ {tree.size ()}
+        {}
+
+        bool operator()( const Node* node ) noexcept;
+    };
 
     // TODO [TheRedHotHabanero]:
-    struct dumpCallable {/* ... use ostream? ...*/};
+    struct SortedOrderTester;
+    // TODO [TheRedHotHabanero]:
+    struct ColorsTester;
+    // TODO [TheRedHotHabanero]:
+    struct Dumper;
 };
 
 } // namespace tree
+
+#include "tree-impl.hh"
 
 #endif // #ifndef TREE_HH_INCL
