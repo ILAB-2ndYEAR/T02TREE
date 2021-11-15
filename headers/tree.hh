@@ -82,6 +82,7 @@ public:
     Iterator find( const Data& ) const;
     bool erase( const Data& );
 
+    // Methods from the KV task
     size_t countLesser( const Data& ) const;
     Data lesserOfOrderK( size_t k ) const;
 
@@ -129,8 +130,17 @@ private:
         bool operator()( const Node* node ) noexcept;
     };
 
-    // TODO [TheRedHotHabanero]:
-    struct SortedOrderTester;
+    // Checks that tree is ordered correctly.
+    struct SortedOrderTester
+    {
+        bool sorted_order = false;
+
+        SortedOrderTester( const StatTree& tree ):
+            sorted_order { tree.bypass() }
+        {}
+
+        bool operator()( const Node* node ) noexcept;
+    };
     // TODO [TheRedHotHabanero]:
     struct ColorsTester;
     // TODO [TheRedHotHabanero]:
