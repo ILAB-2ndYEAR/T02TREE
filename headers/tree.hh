@@ -78,10 +78,16 @@ public:
     StatTree( StatTree&& sd ) = delete;
 
     // TODO [TheRedHotHabanero]:
-    Iterator insert( const Data& );
+    //bool insert(subset_node** sn, int k, subset_node* parent = nullptr)
+    void right_rotation( const Node& node );
+    void left_rotation( const Node& node );
+    void swipe_colors (const Node& node );
+    void balance( const StatTree& tree, const Node& node );
+    Iterator insert( const StatTree& tree, const Data& key );
     Iterator find( const Data& ) const;
     bool erase( const Data& );
 
+    // Methods from the KV task
     size_t countLesser( const Data& ) const;
     Data lesserOfOrderK( size_t k ) const;
 
@@ -129,8 +135,17 @@ private:
         bool operator()( const Node* node ) noexcept;
     };
 
-    // TODO [TheRedHotHabanero]:
-    struct SortedOrderTester;
+    // Checks that tree is ordered correctly.
+    struct SortedOrderTester
+    {
+        bool sorted_order = false;
+
+        SortedOrderTester( const StatTree& tree ):
+            sorted_order { tree.bypass() }
+        {}
+
+        bool operator()( const Node* node ) noexcept;
+    };
     // TODO [TheRedHotHabanero]:
     struct ColorsTester;
     // TODO [TheRedHotHabanero]:

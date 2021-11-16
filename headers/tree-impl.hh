@@ -124,6 +124,84 @@ bool StatTree<Data, Compare>::SizesTester::operator()( const Node* node ) noexce
 
     return true;
 }
+template<class Data, class Compare>
+void StatTree<Data, Compare>::right_rotation( const Node& x )
+{
+    Node *y = x->left_;
+
+    x.left_ = y.right_;
+    if (y.right_ != nullptr)
+    { y.right_->parent_ = x; }
+
+    if (y != nullptr)
+    { y.parent_ = x.parent_; }
+
+    if (x.parent_)
+    {
+        if (x == x.parent_->right_)
+        { x.parent_->right_ = y; }
+        else
+        { x.parent_->left_ = y; }
+    }
+    else
+    { root_ = y; }
+
+    y.right_ = x;
+    if (x != nullptr)
+    { x.parent_ = y; }
+}
+
+template<class Data, class Compare>
+void StatTree<Data, Compare>::left_rotation( const Node& x )
+{
+    Node *y = x.left_;
+    x.left_ = y.right_;
+
+    if (y.right_ != nullptr)
+    { y.right_->parent_ = x; }
+
+    if (y != nullptr)
+    { y.parent_ = x.parent_; }
+
+    if (x.parent_)
+    {
+        if (x == x.parent_->right_)
+        { x.parent_->right_ = y; }
+        else
+        { x.parent_->left_ = y; }
+    }
+    else
+    { root_ = y; }
+
+    y.right_ = x;
+    if (x != nullptr)
+    { x.parent_ = y; }
+}
+
+template<class Data, class Compare>
+void StatTree<Data, Compare>::swipe_colors( const Node& node )
+{
+    node.right_->.color_ = Color::BLACK;
+    node.left_->color_   = Color::BLACK;
+    node.parent_->color  = Color::RED;
+}
+
+template<class Data, class Compare>
+void StatTree<Data, Compare>::balance( const StatTree& tree, const Node& node )
+{
+    Node right_node     = node.right;
+    Node left_node      = node.left;
+    Node parent_node    = node.parent_;
+
+    if (right_node.color_ == Color::RED && left_node.color_ == Color::BLACK)
+    { tree.left_rotation(node); }
+
+    else if (left_node.color_ == Color::RED && right_node->left_.color_ == Color::RED )
+    { tree.right_rotation(node); }
+
+    else if (left_node.color_ == Color::RED && right_node.color_ == Color::RED)
+    { tree.swipe_colors(node); }
+}
 
 template<class Data, class Compare>
 bool StatTree<Data, Compare>::verify() const
