@@ -78,7 +78,12 @@ public:
     StatTree( StatTree&& sd ) = delete;
 
     // TODO [TheRedHotHabanero]:
-    Iterator insert( const Data& );
+    //bool insert(subset_node** sn, int k, subset_node* parent = nullptr)
+    void right_rotation( const Node& node );
+    void left_rotation( const Node& node );
+    void swipe_colors (const Node& node );
+    void balance( const StatTree& tree, const Node& node );
+    Iterator insert( const StatTree& tree, const Data& key );
     Iterator find( const Data& ) const;
     bool erase( const Data& );
 
