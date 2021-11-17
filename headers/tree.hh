@@ -83,7 +83,7 @@ public:
     void left_rotation( Node* node );
     void swipe_colors (Node& node );
     void balance( StatTree& tree, Node& node );
-    void insert( StatTree& tree, const Data& new_data );
+    Node insert( StatTree& tree, const Data& new_data );
     Iterator find( const Data& ) const;
     bool erase( const Data& );
 
