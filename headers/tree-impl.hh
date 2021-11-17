@@ -8,6 +8,28 @@ namespace tree
 {
 
 template<class Data, class Compare>
+StatTree<Data, Compare>::Iterator StatTree<Data, Compare>::find( const Data& toFind ) const
+{
+    Node* curNode = root_;
+
+    while (curNode != nullptr)
+    {
+        const Data& curData = curNode->data_;
+
+        if (toFind > curData)
+            curNode = curNode->right_;
+        else if (toFind < curData)
+            curNode = curNode->left_;
+        else break;
+    }
+
+    if (curNode == nullptr)
+        return end ();
+
+    return Iterator (curNode);
+}
+
+template<class Data, class Compare>
 template<class Tester>
 bool StatTree<Data, Compare>::bypass() const
 {
