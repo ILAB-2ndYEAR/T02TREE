@@ -134,7 +134,7 @@ template <class Data, class Compare> void StatTree<Data, Compare>::erase(Iterato
     Node *del = delIt.ptr_;
 
     // Stuff for eraseFixup.
-    Node::Color toCheck = del->color;
+    auto toCheck = Node::getColor(del);
     Node *toFix = nullptr;
     Node *toFixParent = del;
 
@@ -154,7 +154,7 @@ template <class Data, class Compare> void StatTree<Data, Compare>::erase(Iterato
         Node *next = del->right_;
         while (next->left_ != nullptr)
             next = next->left_;
-        toCheck = next->color_;
+        toCheck = Node::getColor(next);
 
         toFixParent = next;
         toFix = next->right_;
@@ -181,44 +181,46 @@ template <class Data, class Compare> void StatTree<Data, Compare>::erase(Iterato
 
 template <class Data, class Compare> void StatTree<Data, Compare>::eraseFixup(Node *toFix, Node *toFixParent)
 {
-    while (toFix != root_ && (toFix == nullptr || toFix->color_ == Node::Color::BLACK))
+    while (toFix != root_ && Node::getColor (toFix) == Node::Color::BLACK)
     {
-        if (toFix == toFixParent->left_)
-        {
-            // Not nil.
-            Node *brother = toFixParent->right_;
-            if (brother->color_ == Node::Color::RED)
-            {
-                brother->color_ = Node::Color::BLACK;
-                toFixParent->color_ = Node::Color::RED;
-                lRotation(toFixParent);
-                brother = toFixParent->right_;
-            }
-            if (brother->left_->color_ == Node::Color::BLACK && brother->right_->color_ == Node::Color::BLACK)
-            {
-                brother->color_ = Node::Color::RED;
-                toFix = toFixParent;
-                toFixParent = toFix->parent_;
-            }
-            else
-            {
-                if (brother->right_->color_ == Node::Color::BLACK)
-                {
-                    brother->left_->color_ = Node::Color::BLACK;
-                    brother->color_ = Node::Color::RED;
-                    rRotation(brother);
-                    brother = toFixParent->right_;
-                }
+        // To run through all variants without copypaste (just simple renaming in right child case).
+        Node::Side left = toFix == toFixParent->left_ ? Node::Side::LEFT : NODE::Side::RIGHT;
+        Node::Side right = ftSide == Node::Side::LEFT ? Node::Side::RIGHT : Node::Side::LEFT;
 
-                brother->color_ = toFixParent->color_;
-                toFixParent->color_ = Node::Color::BLACK;
-                brother->right_->color_ = Node::Color::BLACK;
-                lRotation(toFixParent);
-                toFix = root_;
-            }
+        // Not nil.
+        Node *brother = Node::getChild (toFixParent, right);
+        if (brother->color_ == Node::Color::RED)
+        {
+            brother->color_ = Node::Color::BLACK;
+            toFixParent->color_ = Node::Color::RED;
+            rotation (toFixParent, left);
+
+            brother = Node::getChild(toFixParent, right);
+        }
+        if (Node::getColor(brother->left_) == Node::Color::BLACK &&
+            Node::getColor(brother->right_) == Node::Color::BLACK)
+        {
+            brother->color_ = Node::Color::RED;
+            toFix = toFixParent;
+            toFixParent = toFix->parent_;
         }
         else
         {
+            if (Node::getColor(Node::getChild(brother, right)) == Node::Color::BLACK)
+            {
+                Node::getColor(Node::getChild(brother, left)) = Node::Color::BLACK;
+                brother->color_ = Node::Color::RED;
+                rotation (brother, right);
+
+                brother = Node::getChild(toFixParent, right);
+            }
+
+            brother->color_ = toFixParent->color_;
+            toFixParent->color_ = Node::Color::BLACK;
+            brother->right_->color_ = Node::Color::BLACK;
+            rotation (toFixParent, left);
+
+            toFix = root_;
         }
     }
 
