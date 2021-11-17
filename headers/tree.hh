@@ -50,11 +50,10 @@ class StatTree
     size_t size_ = 0;
 
 public:
-    class Iterator
+    struct Iterator
     {
         Node* ptr_ = nullptr;
 
-    public:
         Data getData() const;
 
         bool operator==( const Iterator& sd ) const noexcept
@@ -85,8 +84,14 @@ public:
     void balance( const StatTree& tree, const Node& node );
     Iterator insert( const StatTree& tree, const Data& key );
     Iterator find( const Data& ) const;
-    bool erase( const Data& );
 
+    void erase( Iterator delIt );
+
+private:
+    void transplant( Node* old, Node* replacing );
+    void eraseFixup( Node* check, Node* checkReplace );
+
+public:
     // Methods from the KV task
     size_t countLesser( const Data& ) const;
     Data lesserOfOrderK( size_t k ) const;

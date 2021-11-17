@@ -30,6 +30,121 @@ StatTree<Data, Compare>::Iterator StatTree<Data, Compare>::find( const Data& toF
 }
 
 template<class Data, class Compare>
+void StatTree<Data, Compare>::transplant( Node* old, Node* replacing )
+{
+    if (old->parent_ == nullptr)
+        root_ = replacing;
+    else if (old->parent_->left_ == old)
+        old->parent_->left_ = replacing;
+    else
+        old->parent_->right_ = replacing;
+    if (replacing != nullptr)
+        replacing->parent_ = old->parent_;
+}
+
+template<class Data, class Compare>
+void StatTree<Data, Compare>::erase( Iterator delIt )
+{
+    if (delIt == end ()) return;
+
+    Node* del = delIt.ptr_;
+
+    // Stuff for eraseFixup.
+    Node::Color toCheck = del->color;
+    Node* toFix = nullptr;
+    Node* toFixParent = del;
+
+    if (del->left_ == nullptr)
+    {
+        toFix = del->right_;
+        transplant (del, toFix);
+    }
+    else if (del->right_ == nullptr)
+    {
+        toFix = del->left_;
+        transplant (del, toFix);
+    }
+    else
+    {
+        // Next node after del.
+        Node* next = del->right_;
+        while (next->left_ != nullptr)
+            next = next->left_;
+        toCheck = next->color_;
+
+        toFixParent = next;
+        toFix = next->right_;
+
+        if (next->parent_ != del)
+        {
+            toFixParent = next->parent_;
+            transplant (next, next->right_);
+            next->right_ = del->right_;
+            next->right_->parent_ = next;
+        }
+
+        transplant (del, next);
+        next->left_ = del->left_;
+        next->left_->parent_ = next;
+        next->color_ = del->color_;
+    }
+
+    if (toCheck == Node::Color::BLACK)
+        eraseFixup (toFix, toFixParent);
+
+    delete del;
+}
+
+template<class Data, class Compare>
+void StatTree<Data, Compare>::eraseFixup( Node* toFix, Node* toFixParent )
+{
+    while (toFix != root_ && (toFix == nullptr || toFix->color_ == Node::Color::BLACK))
+    {
+        if (toFix == toFixParent->left_)
+        {
+            // Not nil.
+            Node* brother = toFixParent->right_;
+            if (brother->color_ == Node::Color::RED)
+            {
+                brother->color_ = Node::Color::BLACK;
+                toFixParent->color_ = Node::Color::RED;
+                left_rotation (toFixParent);
+                brother = toFixParent->right_;
+            }
+            if (brother->left_->color_ == Node::Color::BLACK &&
+                brother->right_->color_ == Node::Color::BLACK)
+            {
+                brother->color_ = Node::Color::RED;
+                toFix = toFixParent;
+                toFixParent = toFix->parent_;
+            }
+            else
+            {
+                if (brother->right_->color_ == Node::Color::BLACK)
+                {
+                    brother->left_->color_ = Node::Color::BLACK;
+                    brother->color_ = Node::Color::RED;
+                    right_rotation (brother);
+                    brother = toFixParent->right_;
+                }
+
+                brother->color_ = toFixParent->color_;
+                toFixParent->color_ = Node::Color::BLACK;
+                brother->right_->color_ = Node::Color::BLACK;
+                left_rotation (toFixParent);
+                toFix = root_;
+            }
+        }
+        else
+        {
+
+        }
+    }
+
+    toFix->color_ = Node::Color::BLACK;
+}
+
+template<class Data, class Compare>
 template<class Tester>
 bool StatTree<Data, Compare>::bypass() const
 {
@@ -181,7 +296,7 @@ void StatTree<Data, Compare>::left_rotation( const Node& x )
 template<class Data, class Compare>
 void StatTree<Data, Compare>::swipe_colors( const Node& node )
 {
-    node.right_->.color_ = Color::BLACK;
+    node.right_->color_ = Color::BLACK;
     node.left_->color_   = Color::BLACK;
     node.parent_->color  = Color::RED;
 }
