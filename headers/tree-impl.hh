@@ -181,7 +181,8 @@ void StatTree<Data, Compare>::balance( StatTree& tree, Node& node )
 }
 
 template<class Data, class Compare>
-typename tree::StatTree<Data, Compare>::Node tree::StatTree<Data, Compare>::insert( StatTree& tree, const Data& new_data )
+//typename tree::StatTree<Data, Compare>::Node tree::StatTree<Data, Compare>::insert( StatTree& tree, const Data& new_data )
+void tree::StatTree<Data, Compare>::insert( StatTree& tree, const Data& new_data )
 {
     Node* current;
     Node* parent;
