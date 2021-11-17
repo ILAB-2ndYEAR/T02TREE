@@ -78,11 +78,11 @@ public:
 
     // TODO [TheRedHotHabanero]:
     //bool insert(subset_node** sn, int k, subset_node* parent = nullptr)
-    void right_rotation( const Node& node );
-    void left_rotation( const Node& node );
-    void swipe_colors (const Node& node );
-    void balance( const StatTree& tree, const Node& node );
-    Iterator insert( const StatTree& tree, const Data& key );
+    void right_rotation( Node* node );
+    void left_rotation( Node* node );
+    void swipe_colors (Node& node );
+    void balance( StatTree& tree, Node& node );
+    Node insert( StatTree& tree, const Data& new_data );
     Iterator find( const Data& ) const;
 
     void erase( Iterator delIt );
