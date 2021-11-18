@@ -186,7 +186,7 @@ template <class Data, class Compare> void StatTree<Data, Compare>::eraseFixup(No
     {
         // To run through all variants without copypaste (just simple renaming in right child case).
         Node::Side left = toFix == toFixParent->left_ ? Node::Side::LEFT : NODE::Side::RIGHT;
-        Node::Side right = ftSide == Node::Side::LEFT ? Node::Side::RIGHT : Node::Side::LEFT;
+        Node::Side right = left == Node::Side::LEFT ? Node::Side::RIGHT : Node::Side::LEFT;
 
         // Not nil because of black depth invariant compliance.
         Node *brother = Node::getChild(toFixParent, right);
