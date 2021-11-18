@@ -278,6 +278,9 @@ typename tree::StatTree<Data, Compare>::Node tree::StatTree<Data, Compare>::inse
 
     x->data_ = new_data;
     x->parent_ = parent;
+    x->left_ = nullptr;
+    x->right_ = nullptr;
+    x->color_ = type_color::RED;
 
     // insert node in tree
     if (parent)
