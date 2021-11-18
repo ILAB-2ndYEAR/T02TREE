@@ -113,9 +113,9 @@ template <class Data, class Compare = std::less<Data>> class StatTree
     void rotation(Node *node, Node::Side side)
     {
         if (side == Node::Side::LEFT)
-            lRotation (node);
+            lRotation(node);
         else
-            rRotation (node);
+            rRotation(node);
     }
 
     void swipeColors(Node *node);
