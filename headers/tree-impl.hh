@@ -356,11 +356,11 @@ template <class Data, class Compare> bool StatTree<Data, Compare>::StructTester:
     Node *right = node->right_;
 
     if (left != nullptr)
-        if (left->parent_ != node || left->Node::Side != Node::Side::LEFT)
+        if (left->parent_ != node)
             return false;
 
     if (right != nullptr)
-        if (right->parent_ != node || right->Node::Side != Node::Side::RIGHT)
+        if (right->parent_ != node)
             return false;
 
     return ++passedNum_ <= treeSize_;

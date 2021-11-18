@@ -45,7 +45,7 @@ template <class Data, class Compare = std::less<Data>> class StatTree
             return node->color_;
         }
 
-        static Node getChild(const Node *node, Side side)
+        static Node *getChild(const Node *node, Side side)
         {
             if (side == Side::LEFT)
                 return node->left_;
