@@ -261,7 +261,7 @@ typename tree::StatTree<Data, Compare>::Node tree::StatTree<Data, Compare>::inse
 {
     Node *current = root_;
     Node *parent = 0;
-    Node *x = 0;
+    Node *x = new Node;
 
     using type_color = typename tree::StatTree<Data, Compare>::Node::Color;
 
