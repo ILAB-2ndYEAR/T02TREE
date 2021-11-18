@@ -3,6 +3,7 @@
 #include <iostream>
 #include <ostream>
 #include <utility>
+#include <cassert>
 
 #ifndef TREE_HH_INCL
 #define TREE_HH_INCL
@@ -33,7 +34,7 @@ template <class Data, class Compare = std::less<Data>> class StatTree
         Node *right_ = nullptr;
         Node *parent_ = nullptr;
 
-        Color color_ = Color::BLACK;
+        Color color_ = Color::RED;
         // Sub trees sizes.
         size_t leftSize_ = 0;
         size_t rightSize_ = 0;
@@ -110,7 +111,6 @@ template <class Data, class Compare = std::less<Data>> class StatTree
     void transplant(Node *old, Node *replacing);
     void rRotation(Node *node);
     void lRotation(Node *node);
-    void swipeColors(Node *node);
 
     void insertFixup(Node *node);
     void eraseFixup(Node *check, Node *checkReplace);
