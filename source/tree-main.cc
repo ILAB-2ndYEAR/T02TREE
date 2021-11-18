@@ -13,7 +13,7 @@ int main()
     {
         int num;
         std::cin >> num;
-        tree.insert(tree, num);
+        tree.insert(num);
     }
 
     return 0;

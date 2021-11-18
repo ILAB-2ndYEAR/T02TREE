@@ -134,7 +134,7 @@ template <class Data, class Compare> void StatTree<Data, Compare>::erase(Iterato
     Node *del = delIt.ptr_;
 
     // Stuff for eraseFixup.
-    Node::Color toCheck = del->color;
+    typename Node::Color toCheck = del->color;
     Node *toFix = nullptr;
     Node *toFixParent = del;
 
@@ -226,7 +226,7 @@ template <class Data, class Compare> void StatTree<Data, Compare>::eraseFixup(No
 }
 
 template <class Data, class Compare>
-typename tree::StatTree<Data, Compare>::Iterator tree::StatTree<Data, Compare>::insert(const Data &new_data)
+typename tree::StatTree<Data, Compare>::Node tree::StatTree<Data, Compare>::insert(const Data &new_data)
 {
     Node *current;
     Node *parent;
@@ -271,7 +271,7 @@ typename tree::StatTree<Data, Compare>::Iterator tree::StatTree<Data, Compare>::
     }
 
     insertFixup(x);
-    return Iterator{x};
+    return *x;
 }
 
 template <class Data, class Compare> void StatTree<Data, Compare>::insertFixup(Node *node)
@@ -280,17 +280,17 @@ template <class Data, class Compare> void StatTree<Data, Compare>::insertFixup(N
 
     if (node->right_->color_ == type_color::RED && node->left_->color_ == type_color::BLACK)
     {
-        tree.lRotation(&node);
+        lRotation(node);
     }
 
     else if (node->left_->color_ == type_color::RED && node->right_->left_->color_ == type_color::RED)
     {
-        tree.rRotation(&node);
+        rRotation(node);
     }
 
     else if (node->left_->color_ == type_color::RED && node->right_->color_ == type_color::RED)
     {
-        tree.swipe_colors(node);
+        swipeColors(node);
     }
 }
 
@@ -356,11 +356,11 @@ template <class Data, class Compare> bool StatTree<Data, Compare>::StructTester:
     Node *right = node->right_;
 
     if (left != nullptr)
-        if (left->parent_ != node || left->side_ != Node::Side::LEFT)
+        if (left->parent_ != node || left->Node::Side != Node::Side::LEFT)
             return false;
 
     if (right != nullptr)
-        if (right->parent_ != node || right->side_ != Node::Side::RIGHT)
+        if (right->parent_ != node || right->Node::Side != Node::Side::RIGHT)
             return false;
 
     return ++passedNum_ <= treeSize_;
