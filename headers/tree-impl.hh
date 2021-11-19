@@ -42,88 +42,64 @@ template <class Data, class Compare> void StatTree<Data, Compare>::transplant(No
         replacing->parent_ = old->parent_;
 }
 
+// Rotate a node x to the right
+//        x                y
+//       / \              / \
+//      y   c    --->    a   x
+//     / \                  / \
+//    a   b                b   c
 template <class Data, class Compare> void StatTree<Data, Compare>::rRotation(Node *x)
 {
-    Node *y = x->left_;
+    Node* y = x->left_;
+    assert(y != 0);
+
+    Node* parent = x->parent_;
+    y->parent_ = parent;
+
+    if (x == parent->left_)
+    {
+        // x is the left son of its parent
+        parent->left_ = y;
+    }
+    else
+    {
+        // x is the right son of its parent
+        parent->right_ = y;
+    }
 
     x->left_ = y->right_;
-    if (y->right_ != nullptr)
-    {
+
+    if (y->right_ != 0)
         y->right_->parent_ = x;
-    }
-
-    if (y != nullptr)
-    {
-        y->parent_ = x->parent_;
-    }
-
-    if (x->parent_)
-    {
-        if (x == x->parent_->right_)
-        {
-            x->parent_->right_ = y;
-        }
-        else
-        {
-            x->parent_->left_ = y;
-        }
-    }
-    else
-    {
-        root_ = y;
-    }
-
     y->right_ = x;
-    if (x != nullptr)
-    {
-        x->parent_ = y;
-    }
+    x->parent_ = y;
 }
 
+// Rotate a node x to the left
+//        x                y
+//       / \              / \
+//      a   y    --->    x   c
+//         / \          / \
+//        b   c        a   b
 template <class Data, class Compare> void StatTree<Data, Compare>::lRotation(Node *x)
 {
-    Node *y = x->left_;
-    x->right_ = y->right_;
+    Node* y = x->right_;
+    assert(y != 0);
 
-    if (y->left_ != nullptr)
-    {
-        y->right_->parent_ = x;
+    Node* parent = x->parent_;
+    y->parent_ = parent;
+    if (x == parent->left_) {
+        // x is the left son of its parent
+        parent->left_ = y;
+    } else {
+        // x is the right son of its parent
+        parent->right_ = y;
     }
-
-    if (y != nullptr)
-    {
-        y->parent_ = x->parent_;
-    }
-
-    if (x->parent_)
-    {
-        if (x == x->parent_->right_)
-        {
-            x->parent_->right_ = y;
-        }
-        else
-        {
-            x->parent_->left_ = y;
-        }
-    }
-    else
-    {
-        root_ = y;
-    }
-
-    y->right_ = x;
-    if (x != nullptr)
-    {
-        x->parent_ = y;
-    }
-}
-
-template <class Data, class Compare> void StatTree<Data, Compare>::swipeColors(Node *node)
-{
-    using type_color = typename tree::StatTree<Data, Compare>::Node::Color;
-    node->right_->color_ = type_color::BLACK;
-    node->left_->color_ = type_color::BLACK;
-    node->parent_->color_ = type_color::RED;
+    x->right_ = y->left_;
+    if (y->left_ != 0)
+        y->left_->parent_ = x;
+    y->left_ = x;
+    x->parent_ = y;
 }
 
 template <class Data, class Compare> void StatTree<Data, Compare>::erase(Iterator delIt)
@@ -228,18 +204,71 @@ template <class Data, class Compare> void StatTree<Data, Compare>::eraseFixup(No
     toFix->color_ = Node::Color::BLACK;
 }
 
-template <class Data, class Compare>
-typename tree::StatTree<Data, Compare>::Iterator tree::StatTree<Data, Compare>::insert(const Data &new_data)
+template <class Data, class Compare> void StatTree<Data, Compare>::insertFixup(Node *x)
 {
-    Node *current;
-    Node *parent;
-    Node *x;
+    using type_color = typename tree::StatTree<Data, Compare>::Node::Color;
+
+    while (x != root_ && x->parent_->color_ == type_color::RED)
+    {
+        if (x->parent_ == x->parent_->parent_->left_)
+        {
+            Node *y = x->parent_->parent_->right_;
+            if (y->color_ == type_color::RED)
+            {
+                x->parent_->color_ = type_color::BLACK;
+                y->color_ = type_color::BLACK;
+                x->parent_->parent_->color_ = type_color::RED;
+                x = x->parent_->parent_;
+            }
+            else
+            {
+                if (x == x->parent_->right_)
+                {
+                    x = x->parent_;
+                    rRotation(x);
+                }
+
+                x->parent_->color_ = type_color::BLACK;
+                x->parent_->parent_->color_ = type_color::RED;
+                rRotation(x->parent_->parent_);
+            }
+        }
+        else
+        {
+            Node* y = x->parent_->parent_->left_;
+            if (y->color_ == type_color::RED)
+            {
+                x->parent_->color_ = type_color::BLACK;
+                y->color_ = type_color::BLACK;
+                x->parent_->parent_->color_ = type_color::RED;
+                x = x->parent_->parent_;
+            }
+            else
+            {
+                if (x == x->parent_->left_)
+                {
+                    x = x->parent_;
+                    rRotation(x);
+                }
+                x->parent_->color_ = type_color::BLACK;
+                x->parent_->parent_->color_ = type_color::RED;
+                lRotation(x->parent_->parent_);
+            }
+        }
+    }
+    root_->color_ = type_color::BLACK;
+}
+
+template <class Data, class Compare>
+typename tree::StatTree<Data, Compare>::Node tree::StatTree<Data, Compare>::insert(const Data &new_data)
+{
+    Node *current = root_;
+    Node *parent = 0;
+    Node *x = new Node;
 
     using type_color = typename tree::StatTree<Data, Compare>::Node::Color;
 
     // find where node belongs
-    current = root_;
-    parent = 0;
     while (current != nullptr)
     {
         if (new_data == current->data_)
@@ -274,27 +303,7 @@ typename tree::StatTree<Data, Compare>::Iterator tree::StatTree<Data, Compare>::
     }
 
     insertFixup(x);
-    return Iterator{x};
-}
-
-template <class Data, class Compare> void StatTree<Data, Compare>::insertFixup(Node *node)
-{
-    using type_color = typename tree::StatTree<Data, Compare>::Node::Color;
-
-    if (node->right_->color_ == type_color::RED && node->left_->color_ == type_color::BLACK)
-    {
-        tree.lRotation(&node);
-    }
-
-    else if (node->left_->color_ == type_color::RED && node->right_->left_->color_ == type_color::RED)
-    {
-        tree.rRotation(&node);
-    }
-
-    else if (node->left_->color_ == type_color::RED && node->right_->color_ == type_color::RED)
-    {
-        tree.swipe_colors(node);
-    }
+    return *x;
 }
 
 template <class Data, class Compare> bool StatTree<Data, Compare>::verify() const
@@ -359,11 +368,11 @@ template <class Data, class Compare> bool StatTree<Data, Compare>::StructTester:
     Node *right = node->right_;
 
     if (left != nullptr)
-        if (left->parent_ != node || left->side_ != Node::Side::LEFT)
+        if (left->parent_ != node)
             return false;
 
     if (right != nullptr)
-        if (right->parent_ != node || right->side_ != Node::Side::RIGHT)
+        if (right->parent_ != node)
             return false;
 
     return ++passedNum_ <= treeSize_;

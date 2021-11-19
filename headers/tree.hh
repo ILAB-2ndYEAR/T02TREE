@@ -3,6 +3,7 @@
 #include <iostream>
 #include <ostream>
 #include <utility>
+#include <cassert>
 
 #ifndef TREE_HH_INCL
 #define TREE_HH_INCL
@@ -33,19 +34,19 @@ template <class Data, class Compare = std::less<Data>> class StatTree
         Node *right_ = nullptr;
         Node *parent_ = nullptr;
 
-        Color color_ = Color::BLACK;
+        Color color_ = Color::RED;
         // Sub trees sizes.
         size_t leftSize_ = 0;
         size_t rightSize_ = 0;
 
-        static getColor(const Node *node)
+        static Node::Color getColor(const Node *node)
         {
             if (node == nullptr)
                 return Color::BLACK;
             return node->color_;
         }
 
-        static getChild(const Node *node, Side side)
+        static Node *getChild(const Node *node, Side side)
         {
             if (side == Side::LEFT)
                 return node->left_;
@@ -103,7 +104,7 @@ template <class Data, class Compare = std::less<Data>> class StatTree
 
     Iterator find(const Data &) const;
     // TODO [TheRedHotHabanero]:
-    Iterator insert(const Data &new_data);
+    Node insert(const Data &new_data);
     void erase(Iterator delIt);
 
   private:
