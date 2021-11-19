@@ -322,7 +322,7 @@ template <class Data, class Compare> template <class Tester> bool StatTree<Data,
     std::vector<bool> rightChildPassed(size_, false);
     size_t depth = 0;
 
-    for (; curNode != nullptr;)
+    while (curNode != nullptr)
     {
         if (!tester(curNode))
             return false;
