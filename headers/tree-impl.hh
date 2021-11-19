@@ -303,6 +303,7 @@ typename tree::StatTree<Data, Compare>::Node tree::StatTree<Data, Compare>::inse
     root_ = x;
   }
 
+  ++size_;
   insertFixup(x);
   return *x;
 }
@@ -426,13 +427,27 @@ bool StatTree<Data, Compare>::SizesTester::operator()(const Node *node) noexcept
 template <class Data, class Compare>
 bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) noexcept
 {
-  if (node == nullptr)
-    return true;
+  std::ofstream out("../tree.txt", std::ios::app);
+  if (out.is_open())
+  {
+    if (node == nullptr)
+      return true;
 
-  std::cout << "\"" << node->data_ << "\" -> "
-            << " \"" << node->right_->data_ << "\"" << std::endl;
-  std::cout << "\"" << node->data_ << "\" -> "
-            << " \"" << node->left_->data_ << "\"" << std::endl;
+    if (node->right_ != nullptr)
+      out << "\"" << node->data_ << "\" -> "
+          << " \"" << node->right_->data_ << "\"" << "[style=" << "\"" << "dotted" << "\"" << "]" << ";" << std::endl;
+    else
+      out << "\"" << node->data_ << "\" -> "
+          << " \"" << "nil" << "\"" << "[style=" << "\"" << "dotted" << "\"" << "]" << ";" << std::endl;
+
+    if (node->left_ != nullptr)
+      out << "\"" << node->data_ << "\" -> "
+          << " \"" << node->left_->data_ << "\""  << ";" << std::endl;
+    else
+      out << "\"" << node->data_ << "\" -> "
+          << " \"" << "nil" << "\""  << ";" << std::endl;
+  }
+  out.close();
   return true;
 }
 

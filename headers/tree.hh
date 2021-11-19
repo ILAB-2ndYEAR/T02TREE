@@ -5,6 +5,7 @@
 #include <ostream>
 #include <unordered_map>
 #include <utility>
+#include <fstream>
 
 #ifndef TREE_HH_INCL
 #define TREE_HH_INCL
@@ -197,11 +198,16 @@ private:
   {
     Dumper(const StatTree &tree)
     {
-      std::cout << "digraph DG {" << std::endl;
+      std::ofstream out;
+      out.open("../tree.txt");
+      if (out.is_open())
+        out << "digraph DG {" << std::endl;
     };
     ~Dumper()
     {
-      std::cout << "}" << std::endl;
+      std::ofstream out("../tree.txt", std::ios::app);
+      if (out.is_open())
+        out << "}" << std::endl;
     }
     bool operator()(const Node *node) noexcept;
   };
