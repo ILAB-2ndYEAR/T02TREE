@@ -83,24 +83,22 @@ template <class Data, class Compare> void StatTree<Data, Compare>::rRotation(Nod
 //        b   c        a   b
 template <class Data, class Compare> void StatTree<Data, Compare>::lRotation(Node *x)
 {
-    Node *y = x->right_;
+    Node* y = x->right_;
     assert(y != 0);
 
-    Node *parent = x->parent_;
-    y->parent_ = parent;
-    if (x == parent->left_)
-    {
-        // x is the left son of its parent
-        parent->left_ = y;
-    }
-    else
-    {
-        // x is the right son of its parent
-        parent->right_ = y;
-    }
     x->right_ = y->left_;
+
     if (y->left_ != 0)
         y->left_->parent_ = x;
+
+    y->parent_ = x->parent_;
+    if (x->parent_ == nullptr)
+      root_ = y;
+    else if (x == x->parent_->left_)
+      x->parent_->left_ = y;
+    else
+      x->parent_->right_ = y;
+
     y->left_ = x;
     x->parent_ = y;
 }
@@ -236,7 +234,7 @@ template <class Data, class Compare> void StatTree<Data, Compare>::insertFixup(N
         else
         {
             Node *y = x->parent_->parent_->left_;
-            if (y->color_ == Color::RED)
+            if (y != nullptr && y->color_ == Color::RED)
             {
                 x->parent_->color_ = Color::BLACK;
                 y->color_ = Color::BLACK;
@@ -429,7 +427,7 @@ bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) noexcept
 template<class Data, class Compare>
 bool StatTree<Data, Compare>::dump() const
 {
-  DFS<tree::StatTree<int>::Dumper>();
+  return DFS<tree::StatTree<int>::Dumper>();
 }
 
 template <class Data, class Compare> bool StatTree<Data, Compare>::ColorsTester::operator()(const Node *node)
