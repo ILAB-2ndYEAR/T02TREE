@@ -196,8 +196,11 @@ private:
   // TODO [TheRedHotHabanero]:
   struct Dumper
   {
+    unsigned long long int cout_nils;
     Dumper(const StatTree &tree)
     {
+      cout_nils = 0;
+
       std::ofstream out;
       out.open("../tree.txt");
       if (out.is_open())

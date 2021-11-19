@@ -431,21 +431,36 @@ bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) noexcept
   if (out.is_open())
   {
     if (node == nullptr)
+    {
       return true;
+    }
 
     if (node->right_ != nullptr)
       out << "\"" << node->data_ << "\" -> "
-          << " \"" << node->right_->data_ << "\"" << "[style=" << "\"" << "dotted" << "\"" << "]" << ";" << std::endl;
+          << " \"" << node->right_->data_ << "\"" << "[style=" << "\"" << "dotted" << "\"" << "];" << std::endl;
     else
+    {
+      ++cout_nils;
       out << "\"" << node->data_ << "\" -> "
-          << " \"" << "nil" << "\"" << "[style=" << "\"" << "dotted" << "\"" << "]" << ";" << std::endl;
+          << " \"" << "nil" << cout_nils  << "\"" << "[style=" << "\"" << "dotted" << "\"" << "];" << std::endl;
+      out << "\"" << "nil" << cout_nils << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "BLACK" << "\"];" << std::endl;
+    }
 
     if (node->left_ != nullptr)
       out << "\"" << node->data_ << "\" -> "
           << " \"" << node->left_->data_ << "\""  << ";" << std::endl;
     else
+    {
+      ++cout_nils;
       out << "\"" << node->data_ << "\" -> "
-          << " \"" << "nil" << "\""  << ";" << std::endl;
+          << " \"" << "nil" << cout_nils  << "\""  << ";" << std::endl;
+      out << "\"" << "nil" << cout_nils << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "BLACK" << "\"];" << std::endl;
+    }
+
+    if (node != nullptr && node->color_ == Color::RED)
+      out << "\"" << node->data_ << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "RED" << "\"];" << std::endl;
+    else if (node == nullptr | node->color_ == Color::BLACK)
+      out << "\"" << node->data_ << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "BLACK" << "\"];" << std::endl;
   }
   out.close();
   return true;
