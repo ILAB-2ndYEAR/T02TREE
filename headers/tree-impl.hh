@@ -311,9 +311,9 @@ typename tree::StatTree<Data, Compare>::Node tree::StatTree<Data, Compare>::inse
 template <class Data, class Compare>
 bool StatTree<Data, Compare>::verify() const
 {
-  if (!DFS<StatTree<Data, Compare>::StructTester>())
+  if (!DFS<StatTree<Data, Compare>::StructTester>(StructTester {*this}))
     return false;
-  if (!DFS<StatTree<Data, Compare>::SizesTester>())
+  if (!DFS<StatTree<Data, Compare>::SizesTester>(SizesTester {*this}))
     return false;
 
   return true;
@@ -321,18 +321,19 @@ bool StatTree<Data, Compare>::verify() const
 
 template <class Data, class Compare>
 template <class Tester>
-bool StatTree<Data, Compare>::DFS() const
+bool StatTree<Data, Compare>::DFS( Tester&& tester ) const
 {
-  Tester tester{*this};
-
   Node *curNode = root_;
-  std::vector<bool> rightChildPassed(size_, false);
+  std::vector<bool> rightChildPassed {};
   size_t depth = 0;
 
   while (curNode != nullptr)
   {
     if (!tester(curNode))
       return false;
+
+    if (depth == rightChildPassed.size ())
+        rightChildPassed.push_back (false);
 
     if (curNode->left_ != nullptr)
     {
@@ -459,7 +460,7 @@ bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) noexcept
 
     if (node != nullptr && node->color_ == Color::RED)
       out << "\"" << node->data_ << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "RED" << "\"];" << std::endl;
-    else if (node == nullptr | node->color_ == Color::BLACK)
+    else if (node == nullptr || node->color_ == Color::BLACK)
       out << "\"" << node->data_ << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "BLACK" << "\"];" << std::endl;
   }
   out.close();
@@ -469,7 +470,7 @@ bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) noexcept
 template <class Data, class Compare>
 bool StatTree<Data, Compare>::dump() const
 {
-  return DFS<tree::StatTree<int>::Dumper>();
+  return DFS<tree::StatTree<int>::Dumper>(Dumper {*this});
 }
 
 template <class Data, class Compare>

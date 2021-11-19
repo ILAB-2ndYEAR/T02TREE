@@ -140,7 +140,7 @@ private:
   // Bypasses all tree and calls tester (curNode) for all nodes.
   // Returns 'true' in case of success check (dump) and 'false' otherwise.
   template <class Tester>
-  bool DFS() const;
+  bool DFS( Tester&& tester ) const;
 
   // Used by StructTester to avoid looping.
   bool toggleValue() const noexcept
@@ -197,6 +197,8 @@ private:
   struct Dumper
   {
     unsigned long long int cout_nils;
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-parameter"
     Dumper(const StatTree &tree)
     {
       cout_nils = 0;
@@ -206,6 +208,7 @@ private:
       if (out.is_open())
         out << "digraph DG {" << std::endl;
     };
+    #pragma GCC diagnostic pop
     ~Dumper()
     {
       std::ofstream out("../tree.txt", std::ios::app);
