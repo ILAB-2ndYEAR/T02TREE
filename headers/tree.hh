@@ -15,19 +15,19 @@ namespace tree
 // complexity.
 template <class Data, class Compare = std::less<Data>> class StatTree
 {
+    enum class Side
+    {
+        LEFT,
+        RIGHT
+    };
+    enum class Color
+    {
+        RED,
+        BLACK
+    };
+
     struct Node
     {
-        enum class Side
-        {
-            LEFT,
-            RIGHT
-        };
-        enum class Color
-        {
-            RED,
-            BLACK
-        };
-
         Data data_;
 
         Node *left_ = nullptr;
@@ -39,7 +39,7 @@ template <class Data, class Compare = std::less<Data>> class StatTree
         size_t leftSize_ = 0;
         size_t rightSize_ = 0;
 
-        static Node::Color getColor(const Node *node)
+        static Color getColor(const Node *node)
         {
             if (node == nullptr)
                 return Color::BLACK;
@@ -111,9 +111,9 @@ template <class Data, class Compare = std::less<Data>> class StatTree
     void transplant(Node *old, Node *replacing);
     void rRotation(Node *node);
     void lRotation(Node *node);
-    void rotation(Node *node, Node::Side side)
+    void rotation(Node *node, Side side)
     {
-        if (side == Node::Side::LEFT)
+        if (side == Side::LEFT)
             lRotation(node);
         else
             rRotation(node);

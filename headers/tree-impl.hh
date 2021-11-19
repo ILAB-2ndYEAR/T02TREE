@@ -27,7 +27,7 @@ typename StatTree<Data, Compare>::Iterator StatTree<Data, Compare>::find(const D
     if (curNode == nullptr)
         return end();
 
-    return Iterator(curNode);
+    return Iterator {curNode};
 }
 
 template <class Data, class Compare> void StatTree<Data, Compare>::transplant(Node *old, Node *replacing)
@@ -44,9 +44,9 @@ template <class Data, class Compare> void StatTree<Data, Compare>::transplant(No
 
 // Rotate a node x to the right
 //        x                y
-//       / \              / \
+//       / |              / |
 //      y   c    --->    a   x
-//     / \                  / \
+//     / |                  / |
 //    a   b                b   c
 template <class Data, class Compare> void StatTree<Data, Compare>::rRotation(Node *x)
 {
@@ -77,9 +77,9 @@ template <class Data, class Compare> void StatTree<Data, Compare>::rRotation(Nod
 
 // Rotate a node x to the left
 //        x                y
-//       / \              / \
+//       / |              / |
 //      a   y    --->    x   c
-//         / \          / \
+//         / |          / |
 //        b   c        a   b
 template <class Data, class Compare> void StatTree<Data, Compare>::lRotation(Node *x)
 {
@@ -150,7 +150,7 @@ template <class Data, class Compare> void StatTree<Data, Compare>::erase(Iterato
         next->color_ = del->color_;
     }
 
-    if (toCheck == Node::Color::BLACK)
+    if (toCheck == Color::BLACK)
         eraseFixup(toFix, toFixParent);
 
     delete del;
@@ -158,66 +158,64 @@ template <class Data, class Compare> void StatTree<Data, Compare>::erase(Iterato
 
 template <class Data, class Compare> void StatTree<Data, Compare>::eraseFixup(Node *toFix, Node *toFixParent)
 {
-    while (toFix != root_ && Node::getColor(toFix) == Node::Color::BLACK)
+    while (toFix != root_ && Node::getColor(toFix) == Color::BLACK)
     {
         // To run through all variants without copypaste (just simple renaming in right child case).
-        Node::Side left = toFix == toFixParent->left_ ? Node::Side::LEFT : NODE::Side::RIGHT;
-        Node::Side right = left == Node::Side::LEFT ? Node::Side::RIGHT : Node::Side::LEFT;
+        auto left = toFix == toFixParent->left_ ? Side::LEFT : Side::RIGHT;
+        auto right = left == Side::LEFT ? Side::RIGHT : Side::LEFT;
 
         // Not nil because of black depth invariant compliance.
         Node *brother = Node::getChild(toFixParent, right);
-        if (brother->color_ == Node::Color::RED)
+        if (brother->color_ == Color::RED)
         {
-            brother->color_ = Node::Color::BLACK;
-            toFixParent->color_ = Node::Color::RED;
+            brother->color_ = Color::BLACK;
+            toFixParent->color_ = Color::RED;
             rotation(toFixParent, left);
 
             brother = Node::getChild(toFixParent, right);
         }
-        if (Node::getColor(brother->left_) == Node::Color::BLACK &&
-            Node::getColor(brother->right_) == Node::Color::BLACK)
+        if (Node::getColor(brother->left_) == Color::BLACK &&
+            Node::getColor(brother->right_) == Color::BLACK)
         {
-            brother->color_ = Node::Color::RED;
+            brother->color_ = Color::RED;
             toFix = toFixParent;
             toFixParent = toFix->parent_;
         }
         else
         {
-            if (Node::getColor(Node::getChild(brother, right)) == Node::Color::BLACK)
+            if (Node::getColor(Node::getChild(brother, right)) == Color::BLACK)
             {
-                Node::getChild(brother, left)->color_ = Node::Color::BLACK;
-                brother->color_ = Node::Color::RED;
+                Node::getChild(brother, left)->color_ = Color::BLACK;
+                brother->color_ = Color::RED;
                 rotation(brother, right);
 
                 brother = Node::getChild(toFixParent, right);
             }
 
             brother->color_ = toFixParent->color_;
-            toFixParent->color_ = Node::Color::BLACK;
-            brother->right_->color_ = Node::Color::BLACK;
+            toFixParent->color_ = Color::BLACK;
+            brother->right_->color_ = Color::BLACK;
             rotation(toFixParent, left);
 
             toFix = root_;
         }
     }
 
-    toFix->color_ = Node::Color::BLACK;
+    toFix->color_ = Color::BLACK;
 }
 
 template <class Data, class Compare> void StatTree<Data, Compare>::insertFixup(Node *x)
 {
-    using type_color = typename tree::StatTree<Data, Compare>::Node::Color;
-
-    while (x != root_ && x->parent_->color_ == type_color::RED)
+    while (x != root_ && x->parent_->color_ == Color::RED)
     {
         if (x->parent_ == x->parent_->parent_->left_)
         {
             Node *y = x->parent_->parent_->right_;
-            if (y->color_ == type_color::RED)
+            if (y->color_ == Color::RED)
             {
-                x->parent_->color_ = type_color::BLACK;
-                y->color_ = type_color::BLACK;
-                x->parent_->parent_->color_ = type_color::RED;
+                x->parent_->color_ = Color::BLACK;
+                y->color_ = Color::BLACK;
+                x->parent_->parent_->color_ = Color::RED;
                 x = x->parent_->parent_;
             }
             else
@@ -228,19 +226,19 @@ template <class Data, class Compare> void StatTree<Data, Compare>::insertFixup(N
                     rRotation(x);
                 }
 
-                x->parent_->color_ = type_color::BLACK;
-                x->parent_->parent_->color_ = type_color::RED;
+                x->parent_->color_ = Color::BLACK;
+                x->parent_->parent_->color_ = Color::RED;
                 rRotation(x->parent_->parent_);
             }
         }
         else
         {
             Node* y = x->parent_->parent_->left_;
-            if (y->color_ == type_color::RED)
+            if (y->color_ == Color::RED)
             {
-                x->parent_->color_ = type_color::BLACK;
-                y->color_ = type_color::BLACK;
-                x->parent_->parent_->color_ = type_color::RED;
+                x->parent_->color_ = Color::BLACK;
+                y->color_ = Color::BLACK;
+                x->parent_->parent_->color_ = Color::RED;
                 x = x->parent_->parent_;
             }
             else
@@ -250,13 +248,13 @@ template <class Data, class Compare> void StatTree<Data, Compare>::insertFixup(N
                     x = x->parent_;
                     rRotation(x);
                 }
-                x->parent_->color_ = type_color::BLACK;
-                x->parent_->parent_->color_ = type_color::RED;
+                x->parent_->color_ = Color::BLACK;
+                x->parent_->parent_->color_ = Color::RED;
                 lRotation(x->parent_->parent_);
             }
         }
     }
-    root_->color_ = type_color::BLACK;
+    root_->color_ = Color::BLACK;
 }
 
 template <class Data, class Compare>
@@ -265,8 +263,6 @@ typename tree::StatTree<Data, Compare>::Node tree::StatTree<Data, Compare>::inse
     Node *current = root_;
     Node *parent = 0;
     Node *x = new Node;
-
-    using type_color = typename tree::StatTree<Data, Compare>::Node::Color;
 
     // find where node belongs
     while (current != nullptr)
@@ -283,7 +279,7 @@ typename tree::StatTree<Data, Compare>::Node tree::StatTree<Data, Compare>::inse
     x->parent_ = parent;
     x->left_ = nullptr;
     x->right_ = nullptr;
-    x->color_ = type_color::RED;
+    x->color_ = Color::RED;
 
     // insert node in tree
     if (parent)
