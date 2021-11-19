@@ -1,9 +1,10 @@
 
+#include <cassert>
 #include <functional>
 #include <iostream>
 #include <ostream>
+#include <unordered_map>
 #include <utility>
-#include <cassert>
 
 #ifndef TREE_HH_INCL
 #define TREE_HH_INCL
@@ -185,7 +186,12 @@ template <class Data, class Compare = std::less<Data>> class StatTree
         bool operator()(const Node *node) noexcept;
     };
     // TODO [TheRedHotHabanero]:
-    struct ColorsTester;
+    struct ColorsTester
+    {
+        std::unordered_map<Node *, size_t> blackHeights_{};
+
+        bool operator()(const Node *node);
+    };
     // TODO [TheRedHotHabanero]:
     struct Dumper;
 };
