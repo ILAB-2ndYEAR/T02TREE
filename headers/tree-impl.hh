@@ -204,53 +204,52 @@ template <class Data, class Compare> void StatTree<Data, Compare>::eraseFixup(No
     toFix->color_ = Color::BLACK;
 }
 
-template <class Data, class Compare> void StatTree<Data, Compare>::insertFixup(Node *x)
+template <class Data, class Compare> void StatTree<Data, Compare>::insertFixup(Node *z)
 {
-    while (x != root_ && x->parent_->color_ == Color::RED)
+    while (z != root_ && Node::getColor(z->parent_) == Color::RED)
     {
-        if (x->parent_ == x->parent_->parent_->left_)
+        if (z->parent_ == z->parent_->parent_->left_)
         {
-            Node *y = x->parent_->parent_->right_;
-            if (y->color_ == Color::RED)
+            Node *y = z->parent_->parent_->right_;
+            if (Node::getColor(y) == Color::RED)
             {
-                x->parent_->color_ = Color::BLACK;
-                y->color_ = Color::BLACK;
-                x->parent_->parent_->color_ = Color::RED;
-                x = x->parent_->parent_;
+                z->parent_->color_ = Color::BLACK;
+                z->parent_->color_ = Color::BLACK;
+                z->parent_->parent_->color_ = Color::RED;
+                z = z->parent_->parent_;
             }
             else
             {
-                if (x == x->parent_->right_)
-                {
-                    x = x->parent_;
-                    rRotation(x);
-                }
-
-                x->parent_->color_ = Color::BLACK;
-                x->parent_->parent_->color_ = Color::RED;
-                rRotation(x->parent_->parent_);
+              if (z == z->parent_->right_)
+              {
+                z = z->parent_;
+                lRotation(z);
+              }
+              z->parent_->color_ = Color::BLACK;
+              z->parent_->parent_->color_ = Color::RED;
+              rRotation(z->parent_->parent_);
             }
         }
         else
         {
-            Node *y = x->parent_->parent_->left_;
-            if (y != nullptr && y->color_ == Color::RED)
+            Node *y = z->parent_->parent_->left_;
+            if (Node::getColor(y) == Color::RED)
             {
-                x->parent_->color_ = Color::BLACK;
+                z->parent_->color_ = Color::BLACK;
                 y->color_ = Color::BLACK;
-                x->parent_->parent_->color_ = Color::RED;
-                x = x->parent_->parent_;
+                z->parent_->parent_->color_ = Color::RED;
+                z = z->parent_->parent_;
             }
             else
             {
-                if (x == x->parent_->left_)
-                {
-                    x = x->parent_;
-                    rRotation(x);
-                }
-                x->parent_->color_ = Color::BLACK;
-                x->parent_->parent_->color_ = Color::RED;
-                lRotation(x->parent_->parent_);
+              if (z == z->parent_->left_)
+              {
+                z = z->parent_;
+                rRotation(z);
+              }
+              z->parent_->color_ = Color::BLACK;
+              z->parent_->parent_->color_ = Color::RED;
+              lRotation(z->parent_->parent_);
             }
         }
     }
