@@ -17,5 +17,15 @@ int main()
 
   tree.dump();
 
+  std::cin >> n;
+  for (int i = 0; i < n; ++i)
+  {
+    int num = 0;
+    std::cin >> num;
+    tree.erase(tree.find(num));
+  }
+
+  tree.dump();
+
   return 0;
 }

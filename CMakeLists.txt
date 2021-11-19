@@ -15,7 +15,7 @@ set( TARGETS
 foreach( TARGET IN LISTS TARGETS )
 
     add_executable( ${TARGET} )
-    target_compile_features( ${TARGET} PRIVATE cxx_std_17 )
+    target_compile_features( ${TARGET} PRIVATE cxx_std_20 )
     target_include_directories( ${TARGET} PRIVATE
         "${CMAKE_SOURCE_DIR}/headers"
     )
@@ -40,7 +40,7 @@ target_sources( ${TREE_TEST_NAME} PRIVATE "${TREE_TESTS_DIR}/tests-main.cc" )
 set( DEBUG_DEFINE_NAME "DEBUG" )
 
 set( DEBUG_COMPILER_FLAGS
-    -D${DEBUG_DEFINE_NAME}=1 -O0 -g -Wall -Wextra -Wpedantic
+    -D${DEBUG_DEFINE_NAME}=1 -O0 -g -Wall -Wextra -Wpedantic -Werror
 )
 
 set( RELEASE_COMPILER_FLAGS
