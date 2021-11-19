@@ -415,6 +415,23 @@ template <class Data, class Compare> bool StatTree<Data, Compare>::SizesTester::
     return true;
 }
 
+template<class Data, class Compare>
+bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) noexcept
+{
+  if (node == nullptr)
+    return true;
+
+  std::cout << "\"" << node << "\" -> " << " \"" << node->right_ << "\"" << std::endl;
+  std::cout << "\"" << node << "\" -> " << " \"" << node->left_ << "\"" << std::endl;
+  return true;
+}
+
+template<class Data, class Compare>
+bool StatTree<Data, Compare>::dump() const
+{
+  DFS<tree::StatTree<int>::Dumper>();
+}
+
 template <class Data, class Compare> bool StatTree<Data, Compare>::ColorsTester::operator()(const Node *node)
 {
     if (node == root_ && Node::getColor(node) != Color::BLACK)

@@ -132,6 +132,7 @@ template <class Data, class Compare = std::less<Data>> class StatTree
 
     // Calles bypass for all types of checks.
     bool verify() const;
+    bool dump() const;
 
   private:
     // Bypasses all tree and calls tester (curNode) for all nodes.
@@ -193,7 +194,18 @@ template <class Data, class Compare = std::less<Data>> class StatTree
         bool operator()(const Node *node);
     };
     // TODO [TheRedHotHabanero]:
-    struct Dumper;
+    struct Dumper
+    {
+      Dumper(const StatTree& tree)
+      {
+        std::cout << "digraph DG {" << std::endl;
+      };
+      ~Dumper()
+      {
+        std::cout << "}" << std::endl;
+      }
+      bool operator()(const Node *node) noexcept;
+    };
 };
 
 } // namespace tree
