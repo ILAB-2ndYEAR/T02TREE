@@ -459,7 +459,7 @@ bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) noexcept
 
     if (node != nullptr && node->color_ == Color::RED)
       out << "\"" << node->data_ << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "RED" << "\"];" << std::endl;
-    else if (node == nullptr | node->color_ == Color::BLACK)
+    else if (node == nullptr || node->color_ == Color::BLACK)
       out << "\"" << node->data_ << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "BLACK" << "\"];" << std::endl;
   }
   out.close();
