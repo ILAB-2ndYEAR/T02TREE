@@ -16,6 +16,6 @@ int main()
   }
 
   tree.dump();
-  
+
   return 0;
 }

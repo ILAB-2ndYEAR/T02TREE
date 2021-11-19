@@ -429,10 +429,10 @@ bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) noexcept
   if (node == nullptr)
     return true;
 
-  std::cout << "\"" << node << "\" -> "
-            << " \"" << node->right_ << "\"" << std::endl;
-  std::cout << "\"" << node << "\" -> "
-            << " \"" << node->left_ << "\"" << std::endl;
+  std::cout << "\"" << node->data_ << "\" -> "
+            << " \"" << node->right_->data_ << "\"" << std::endl;
+  std::cout << "\"" << node->data_ << "\" -> "
+            << " \"" << node->left_->data_ << "\"" << std::endl;
   return true;
 }
 
