@@ -5,23 +5,23 @@
 
 int main()
 {
-    tree::StatTree<int> tree{};
-    int n = 0;
-    std::cin >> n;
-    for (int i = 0; i < n; ++i)
-    {
-        int num = 0;
-        std::cin >> num;
-        tree.insert(num);
-    }
+  tree::StatTree<int> tree{};
+  int n = 0;
+  std::cin >> n;
+  for (int i = 0; i < n; ++i)
+  {
+    int num = 0;
+    std::cin >> num;
+    tree.insert(num);
+  }
 
-    // std::cin >> n;
-    // for (int i = 0; i < n; ++i)
-    // {
-    //     int num = 0;
-    //     std::cin >> num;
-    //     tree.erase(tree.find(num));
-    // }
+  // std::cin >> n;
+  // for (int i = 0; i < n; ++i)
+  // {
+  //     int num = 0;
+  //     std::cin >> num;
+  //     tree.erase(tree.find(num));
+  // }
 
-    return 0;
+  return 0;
 }
