@@ -111,6 +111,15 @@ template <class Data, class Compare = std::less<Data>> class StatTree
     void transplant(Node *old, Node *replacing);
     void rRotation(Node *node);
     void lRotation(Node *node);
+    void rotation(Node *node, Node::Side side)
+    {
+        if (side == Node::Side::LEFT)
+            lRotation(node);
+        else
+            rRotation(node);
+    }
+
+    void swipeColors(Node *node);
 
     void insertFixup(Node *node);
     void eraseFixup(Node *check, Node *checkReplace);
