@@ -53,26 +53,23 @@ template <class Data, class Compare>
 void StatTree<Data, Compare>::rRotation(Node *x)
 {
   Node *y = x->left_;
-  assert(y != 0);
+  assert(y != nullptr);
 
   Node *parent = x->parent_;
   y->parent_ = parent;
 
-  if (x == parent->left_)
-  {
-    // x is the left son of its parent
+  if (y->right_ != nullptr)
+    y->right_->parent_ = x;
+
+  if (parent == nullptr)
+      root_ = y;
+  else if (x == parent->left_)
     parent->left_ = y;
-  }
   else
-  {
-    // x is the right son of its parent
     parent->right_ = y;
-  }
 
   x->left_ = y->right_;
 
-  if (y->right_ != 0)
-    y->right_->parent_ = x;
   y->right_ = x;
   x->parent_ = y;
 }
@@ -87,11 +84,11 @@ template <class Data, class Compare>
 void StatTree<Data, Compare>::lRotation(Node *x)
 {
   Node *y = x->right_;
-  assert(y != 0);
+  assert(y != nullptr);
 
   x->right_ = y->left_;
 
-  if (y->left_ != 0)
+  if (y->left_ != nullptr)
     y->left_->parent_ = x;
 
   y->parent_ = x->parent_;
@@ -122,11 +119,13 @@ void StatTree<Data, Compare>::erase(Iterator delIt)
   if (del->left_ == nullptr)
   {
     toFix = del->right_;
+    toFixParent = del->parent_;
     transplant(del, toFix);
   }
   else if (del->right_ == nullptr)
   {
     toFix = del->left_;
+    toFixParent = del->parent_;
     transplant(del, toFix);
   }
   else
@@ -349,7 +348,7 @@ bool StatTree<Data, Compare>::DFS( Tester&& tester ) const
       continue;
     }
 
-    for (curNode = curNode->parent_, --depth; curNode != nullptr;)
+    for (curNode = curNode->parent_, --depth; curNode != nullptr; --depth)
     {
       if (!rightChildPassed[depth] && curNode->right_ != nullptr)
       {
