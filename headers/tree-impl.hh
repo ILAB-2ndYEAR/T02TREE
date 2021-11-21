@@ -321,8 +321,8 @@ size_t StatTree<Data, Compare>::countLesser(const Node* node, const size_t m) co
 }
 
 template <class Data, class Compare>
-template <class Tester>
-bool StatTree<Data, Compare>::DFS(Tester &&tester) const
+template <class Callable>
+bool StatTree<Data, Compare>::DFS(const Callable &callable) const
 {
   Node *curNode = root_;
   std::vector<bool> rightChildPassed{};
@@ -330,7 +330,7 @@ bool StatTree<Data, Compare>::DFS(Tester &&tester) const
 
   while (curNode != nullptr)
   {
-    if (!tester(curNode))
+    if (!callable(curNode))
       return false;
 
     if (depth == rightChildPassed.size())
@@ -367,7 +367,7 @@ bool StatTree<Data, Compare>::DFS(Tester &&tester) const
 }
 
 template <class Data, class Compare>
-bool StatTree<Data, Compare>::StructTester::operator()(Node *node) noexcept
+bool StatTree<Data, Compare>::StructTester::operator()(Node *node) const noexcept
 {
   if (node->passToggle(passToggle_))
     return false;
@@ -387,7 +387,7 @@ bool StatTree<Data, Compare>::StructTester::operator()(Node *node) noexcept
 }
 
 template <class Data, class Compare>
-bool StatTree<Data, Compare>::SizesTester::operator()(const Node *node) noexcept
+bool StatTree<Data, Compare>::SizesTester::operator()(const Node *node) const noexcept
 {
   const Node *l = node->left_;
   const Node *r = node->right_;
@@ -427,7 +427,7 @@ bool StatTree<Data, Compare>::SizesTester::operator()(const Node *node) noexcept
 }
 
 template <class Data, class Compare>
-bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) noexcept
+bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) const noexcept
 {
   std::ofstream out("../tree.txt", std::ios::app);
   if (out.is_open())
@@ -507,7 +507,7 @@ bool StatTree<Data, Compare>::dump() const
 }
 
 template <class Data, class Compare>
-bool StatTree<Data, Compare>::ColorsTester::operator()(const Node *node)
+bool StatTree<Data, Compare>::ColorsTester::operator()(const Node *node) const
 {
   if (node == root_ && Node::getColor(node) != Color::BLACK)
     return false;

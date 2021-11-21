@@ -103,7 +103,7 @@ public:
 
   Iterator end() const
   {
-    const Node *end = root_;
+    Node *end = root_;
     if (end == nullptr)
         return Iterator{nullptr, true};
     while (end->right_ != nullptr)
@@ -159,8 +159,8 @@ public:
 private:
   // Bypasses all tree and calls tester (curNode) for all nodes.
   // Returns 'true' in case of success check (dump) and 'false' otherwise.
-  template <class Tester>
-  bool DFS(Tester &&tester) const;
+  template <class Callable>
+  bool DFS(const Callable &callable) const;
 
   // Used by StructTester to avoid looping.
   bool toggleValue() const noexcept
@@ -176,47 +176,47 @@ private:
   {
     const size_t treeSize_;
     const bool passToggle_;
-    size_t passedNum_ = 0;
+    mutable size_t passedNum_ = 0;
 
     StructTester(const StatTree &tree) : treeSize_{tree.size()}, passToggle_{tree.toggleValue()}
     {}
 
-    bool operator()(Node *) noexcept;
+    bool operator()(Node *) const noexcept;
   };
 
   // Checks that all sizes are counted correctly.
   struct SizesTester
   {
-    bool rootPassed_ = false;
+    mutable bool rootPassed_ = false;
     const size_t treeSize_;
 
     SizesTester(const StatTree &tree) : treeSize_{tree.size()}
     {}
 
-    bool operator()(const Node *node) noexcept;
+    bool operator()(const Node *node) const noexcept;
   };
 
   // Checks that tree is ordered correctly.
   struct SortedOrderTester
   {
-    bool sorted_order = false;
+    mutable bool sorted_order = false;
 
     SortedOrderTester(const StatTree &tree) : sorted_order{tree.bypass()}
     {}
 
-    bool operator()(const Node *node) noexcept;
+    bool operator()(const Node *node) const noexcept;
   };
 
   struct ColorsTester
   {
-    std::unordered_map<Node *, size_t> blackHeights_{};
+    mutable std::unordered_map<Node *, size_t> blackHeights_{};
 
-    bool operator()(const Node *node);
+    bool operator()(const Node *node) const;
   };
 
   struct Dumper
   {
-    unsigned long long int cout_nils;
+    mutable unsigned long long int cout_nils;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
     Dumper(const StatTree &tree)
@@ -235,7 +235,7 @@ private:
       if (out.is_open())
         out << "}" << std::endl;
     }
-    bool operator()(const Node *node) noexcept;
+    bool operator()(const Node *node) const noexcept;
   };
 };
 

@@ -15,9 +15,6 @@ int main()
     tree.insert(num);
   }
 
-  tree.dump();
-
-  /*
   std::cin >> n;
   for (int i = 0; i < n; ++i)
   {
@@ -27,6 +24,5 @@ int main()
   }
 
   tree.dump();
-  */
   return 0;
 }
