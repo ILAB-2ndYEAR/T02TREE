@@ -264,47 +264,34 @@ void StatTree<Data, Compare>::insertFixup(Node *z)
 template <class Data, class Compare>
 typename tree::StatTree<Data, Compare>::Node tree::StatTree<Data, Compare>::insert(const Data &new_data)
 {
-  Node *current = root_;
-  Node *parent = 0;
-  Node *x = new Node;
+  Node* y = nullptr;
+  Node* x = root_;
+  Node* z = new Node{new_data};
 
-  // find where node belongs
-  while (current != nullptr)
+  while (x != nullptr)
   {
-    if (new_data == current->data_)
-    {
-      return (*current);
-    }
-    parent = current;
-    current = (new_data < current->data_) ? current->left_ : current->right_;
-  }
-
-  x->data_ = new_data;
-  x->parent_ = parent;
-  x->left_ = nullptr;
-  x->right_ = nullptr;
-  x->color_ = Color::RED;
-
-  // insert node in tree
-  if (parent)
-  {
-    if (new_data < parent->data_)
-    {
-      parent->left_ = x;
-    }
+    y = x;
+    if (z->data_ < x->data_)
+      x = x->left_;
     else
-    {
-      parent->right_ = x;
-    }
-  }
-  else
-  {
-    root_ = x;
+      x = x->right_;
   }
 
-  ++size_;
-  insertFixup(x);
-  return *x;
+  z->parent_ = y;
+
+  if (y == nullptr)
+    root_ = z;
+  else if (z->data_ < y->data_)
+    y->left_ = z;
+  else
+    y->right_ = z;
+
+  z->left_ = nullptr;
+  z->right_ = nullptr;
+  z->color_ = Color::RED;
+
+  insertFixup(z);
+  return (*z);
 }
 
 template <class Data, class Compare>
