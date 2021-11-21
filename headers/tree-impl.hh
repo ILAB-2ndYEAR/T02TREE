@@ -50,28 +50,28 @@ void StatTree<Data, Compare>::transplant(Node *old, Node *replacing)
 //     / |                  / |
 //    a   b                b   c
 template <class Data, class Compare>
-void StatTree<Data, Compare>::rRotation(Node *x)
+void StatTree<Data, Compare>::rRotation(Node *node)
 {
-  Node *y = x->left_;
-  assert(y != nullptr);
+  Node *left_node = node->left_;
+  assert(left_node != nullptr);
 
-  Node *parent = x->parent_;
-  y->parent_ = parent;
+  Node *parent = node->parent_;
+  left_node->parent_ = parent;
 
-  if (y->right_ != nullptr)
-    y->right_->parent_ = x;
+  if (left_node->right_ != nullptr)
+    left_node->right_->parent_ = node;
 
   if (parent == nullptr)
-      root_ = y;
-  else if (x == parent->left_)
-    parent->left_ = y;
+    root_ = left_node;
+  else if (node == parent->left_)
+    parent->left_ = left_node;
   else
-    parent->right_ = y;
+    parent->right_ = left_node;
 
-  x->left_ = y->right_;
+  node->left_ = left_node->right_;
 
-  y->right_ = x;
-  x->parent_ = y;
+  left_node->right_ = node;
+  node->parent_ = left_node;
 }
 
 // Rotate a node x to the left
@@ -81,26 +81,26 @@ void StatTree<Data, Compare>::rRotation(Node *x)
 //         / |          / |
 //        b   c        a   b
 template <class Data, class Compare>
-void StatTree<Data, Compare>::lRotation(Node *x)
+void StatTree<Data, Compare>::lRotation(Node *node)
 {
-  Node *y = x->right_;
-  assert(y != nullptr);
+  Node *right_node = node->right_;
+  assert(right_node != nullptr);
 
-  x->right_ = y->left_;
+  node->right_ = right_node->left_;
 
-  if (y->left_ != nullptr)
-    y->left_->parent_ = x;
+  if (right_node->left_ != nullptr)
+    right_node->left_->parent_ = node;
 
-  y->parent_ = x->parent_;
-  if (x->parent_ == nullptr)
-    root_ = y;
-  else if (x == x->parent_->left_)
-    x->parent_->left_ = y;
+  right_node->parent_ = node->parent_;
+  if (node->parent_ == nullptr)
+    root_ = right_node;
+  else if (node == node->parent_->left_)
+    node->parent_->left_ = right_node;
   else
-    x->parent_->right_ = y;
+    node->parent_->right_ = right_node;
 
-  y->left_ = x;
-  x->parent_ = y;
+  right_node->left_ = node;
+  node->parent_ = right_node;
 }
 
 template <class Data, class Compare>
@@ -209,52 +209,52 @@ void StatTree<Data, Compare>::eraseFixup(Node *toFix, Node *toFixParent)
 }
 
 template <class Data, class Compare>
-void StatTree<Data, Compare>::insertFixup(Node *z)
+void StatTree<Data, Compare>::insertFixup(Node *node)
 {
-  while (Node::getColor(z->parent_) == Color::RED)
+  while (Node::getColor(node->parent_) == Color::RED)
   {
-    if (z->parent_ == z->parent_->parent_->left_)
+    if (node->parent_ == node->parent_->parent_->left_)
     {
-      Node *y = z->parent_->parent_->right_;
-      if (Node::getColor(y) == Color::RED)
+      Node *ppleft_node = node->parent_->parent_->right_;
+      if (Node::getColor(ppleft_node) == Color::RED)
       {
-        z->parent_->color_ = Color::BLACK;
-        y->color_ = Color::BLACK;
-        z->parent_->parent_->color_ = Color::RED;
-        z = z->parent_->parent_;
+        node->parent_->color_ = Color::BLACK;
+        ppleft_node->color_ = Color::BLACK;
+        node->parent_->parent_->color_ = Color::RED;
+        node = node->parent_->parent_;
       }
       else
       {
-        if (z == z->parent_->right_)
+        if (node == node->parent_->right_)
         {
-          z = z->parent_;
-          lRotation(z);
+          node = node->parent_;
+          lRotation(node);
         }
-        z->parent_->color_ = Color::BLACK;
-        z->parent_->parent_->color_ = Color::RED;
-        rRotation(z->parent_->parent_);
+        node->parent_->color_ = Color::BLACK;
+        node->parent_->parent_->color_ = Color::RED;
+        rRotation(node->parent_->parent_);
       }
     }
     else
     {
-      Node *y = z->parent_->parent_->left_;
-      if (Node::getColor(y) == Color::RED)
+      Node *ppleft_node = node->parent_->parent_->left_;
+      if (Node::getColor(ppleft_node) == Color::RED)
       {
-        z->parent_->color_ = Color::BLACK;
-        y->color_ = Color::BLACK;
-        z->parent_->parent_->color_ = Color::RED;
-        z = z->parent_->parent_;
+        node->parent_->color_ = Color::BLACK;
+        ppleft_node->color_ = Color::BLACK;
+        node->parent_->parent_->color_ = Color::RED;
+        node = node->parent_->parent_;
       }
       else
       {
-        if (z == z->parent_->left_)
+        if (node == node->parent_->left_)
         {
-          z = z->parent_;
-          rRotation(z);
+          node = node->parent_;
+          rRotation(node);
         }
-        z->parent_->color_ = Color::BLACK;
-        z->parent_->parent_->color_ = Color::RED;
-        lRotation(z->parent_->parent_);
+        node->parent_->color_ = Color::BLACK;
+        node->parent_->parent_->color_ = Color::RED;
+        lRotation(node->parent_->parent_);
       }
     }
   }
@@ -264,42 +264,42 @@ void StatTree<Data, Compare>::insertFixup(Node *z)
 template <class Data, class Compare>
 typename tree::StatTree<Data, Compare>::Node tree::StatTree<Data, Compare>::insert(const Data &new_data)
 {
-  Node* y = nullptr;
-  Node* x = root_;
-  Node* z = new Node{new_data};
+  Node *cur_root = nullptr;
+  Node *root = root_;
+  Node *new_node = new Node{new_data};
 
-  while (x != nullptr)
+  while (root != nullptr)
   {
-    y = x;
-    if (z->data_ < x->data_)
-      x = x->left_;
+    cur_root = root;
+    if (new_node->data_ < root->data_)
+      root = root->left_;
     else
-      x = x->right_;
+      root = root->right_;
   }
 
-  z->parent_ = y;
+  new_node->parent_ = cur_root;
 
-  if (y == nullptr)
-    root_ = z;
-  else if (z->data_ < y->data_)
-    y->left_ = z;
+  if (cur_root == nullptr)
+    root_ = new_node;
+  else if (new_node->data_ < cur_root->data_)
+    cur_root->left_ = new_node;
   else
-    y->right_ = z;
+    cur_root->right_ = new_node;
 
-  z->left_ = nullptr;
-  z->right_ = nullptr;
-  z->color_ = Color::RED;
+  new_node->left_ = nullptr;
+  new_node->right_ = nullptr;
+  new_node->color_ = Color::RED;
 
-  insertFixup(z);
-  return (*z);
+  insertFixup(new_node);
+  return (*new_node);
 }
 
 template <class Data, class Compare>
 bool StatTree<Data, Compare>::verify() const
 {
-  if (!DFS<StatTree<Data, Compare>::StructTester>(StructTester {*this}))
+  if (!DFS<StatTree<Data, Compare>::StructTester>(StructTester{*this}))
     return false;
-  if (!DFS<StatTree<Data, Compare>::SizesTester>(SizesTester {*this}))
+  if (!DFS<StatTree<Data, Compare>::SizesTester>(SizesTester{*this}))
     return false;
 
   return true;
@@ -307,10 +307,10 @@ bool StatTree<Data, Compare>::verify() const
 
 template <class Data, class Compare>
 template <class Tester>
-bool StatTree<Data, Compare>::DFS( Tester&& tester ) const
+bool StatTree<Data, Compare>::DFS(Tester &&tester) const
 {
   Node *curNode = root_;
-  std::vector<bool> rightChildPassed {};
+  std::vector<bool> rightChildPassed{};
   size_t depth = 0;
 
   while (curNode != nullptr)
@@ -318,8 +318,8 @@ bool StatTree<Data, Compare>::DFS( Tester&& tester ) const
     if (!tester(curNode))
       return false;
 
-    if (depth == rightChildPassed.size ())
-        rightChildPassed.push_back (false);
+    if (depth == rightChildPassed.size())
+      rightChildPassed.push_back(false);
 
     if (curNode->left_ != nullptr)
     {
@@ -424,31 +424,62 @@ bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) noexcept
 
     if (node->left_ != nullptr)
       out << "\"" << node->data_ << "\" -> "
-          << " \"" << node->left_->data_ << "\""  << ";" << std::endl;
+          << " \"" << node->left_->data_ << "\""
+          << ";" << std::endl;
     else
     {
       ++cout_nils;
       out << "\"" << node->data_ << "\" -> "
-          << " \"" << "nil" << cout_nils  << "\""  << ";" << std::endl;
-      out << "\"" << "nil" << cout_nils << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "BLACK" << "\"];" << std::endl;
+          << " \""
+          << "nil" << cout_nils << "\""
+          << ";" << std::endl;
+      out << "\""
+          << "nil" << cout_nils << "\""
+          << "[style=\"filled\",fontcolor=\"white\",fillcolor="
+          << "\""
+          << "BLACK"
+          << "\"];" << std::endl;
     }
 
     if (node->right_ != nullptr)
       out << "\"" << node->data_ << "\" -> "
-          << " \"" << node->right_->data_ << "\"" << "[style=" << "\"" << "dotted" << "\"" << "];" << std::endl;
+          << " \"" << node->right_->data_ << "\""
+          << "[style="
+          << "\""
+          << "dotted"
+          << "\""
+          << "];" << std::endl;
     else
     {
       ++cout_nils;
       out << "\"" << node->data_ << "\" -> "
-          << " \"" << "nil" << cout_nils  << "\"" << "[style=" << "\"" << "dotted" << "\"" << "];" << std::endl;
-      out << "\"" << "nil" << cout_nils << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "BLACK" << "\"];" << std::endl;
+          << " \""
+          << "nil" << cout_nils << "\""
+          << "[style="
+          << "\""
+          << "dotted"
+          << "\""
+          << "];" << std::endl;
+      out << "\""
+          << "nil" << cout_nils << "\""
+          << "[style=\"filled\",fontcolor=\"white\",fillcolor="
+          << "\""
+          << "BLACK"
+          << "\"];" << std::endl;
     }
 
-
     if (node != nullptr && node->color_ == Color::RED)
-      out << "\"" << node->data_ << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "RED" << "\"];" << std::endl;
+      out << "\"" << node->data_ << "\""
+          << "[style=\"filled\",fontcolor=\"white\",fillcolor="
+          << "\""
+          << "RED"
+          << "\"];" << std::endl;
     else if (node == nullptr || node->color_ == Color::BLACK)
-      out << "\"" << node->data_ << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "BLACK" << "\"];" << std::endl;
+      out << "\"" << node->data_ << "\""
+          << "[style=\"filled\",fontcolor=\"white\",fillcolor="
+          << "\""
+          << "BLACK"
+          << "\"];" << std::endl;
   }
   out.close();
   return true;
@@ -457,7 +488,7 @@ bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) noexcept
 template <class Data, class Compare>
 bool StatTree<Data, Compare>::dump() const
 {
-  return DFS<tree::StatTree<int>::Dumper>(Dumper {*this});
+  return DFS<tree::StatTree<int>::Dumper>(Dumper{*this});
 }
 
 template <class Data, class Compare>
