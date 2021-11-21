@@ -127,7 +127,6 @@ public:
   StatTree(StatTree &&sd) = delete;
 
   Iterator find(const Data &) const;
-  // TODO [TheRedHotHabanero]:
   Node insert(const Data &new_data);
   void erase(Iterator delIt);
 
@@ -150,7 +149,7 @@ private:
 
 public:
   // Methods from the KV task
-  size_t countLesser(const Data &) const;
+  size_t countLesser(const Node* node, const size_t m) const;
   Data lesserOfOrderK(size_t k) const;
 
   // Calles bypass for all types of checks.
@@ -207,14 +206,14 @@ private:
 
     bool operator()(const Node *node) noexcept;
   };
-  // TODO [TheRedHotHabanero]:
+
   struct ColorsTester
   {
     std::unordered_map<Node *, size_t> blackHeights_{};
 
     bool operator()(const Node *node);
   };
-  // TODO [TheRedHotHabanero]:
+
   struct Dumper
   {
     unsigned long long int cout_nils;
