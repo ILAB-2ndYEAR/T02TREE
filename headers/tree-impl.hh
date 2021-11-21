@@ -27,7 +27,7 @@ typename StatTree<Data, Compare>::Iterator StatTree<Data, Compare>::find(const D
   if (curNode == nullptr)
     return end();
 
-  return Iterator{curNode};
+  return Iterator{curNode, false};
 }
 
 template <class Data, class Compare>
