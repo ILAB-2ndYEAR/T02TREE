@@ -211,7 +211,7 @@ void StatTree<Data, Compare>::eraseFixup(Node *toFix, Node *toFixParent)
 template <class Data, class Compare>
 void StatTree<Data, Compare>::insertFixup(Node *z)
 {
-  while (z != root_ && Node::getColor(z->parent_) == Color::RED)
+  while (Node::getColor(z->parent_) == Color::RED)
   {
     if (z->parent_ == z->parent_->parent_->left_)
     {
@@ -219,7 +219,7 @@ void StatTree<Data, Compare>::insertFixup(Node *z)
       if (Node::getColor(y) == Color::RED)
       {
         z->parent_->color_ = Color::BLACK;
-        z->parent_->color_ = Color::BLACK;
+        y->color_ = Color::BLACK;
         z->parent_->parent_->color_ = Color::RED;
         z = z->parent_->parent_;
       }
