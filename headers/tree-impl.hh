@@ -306,6 +306,21 @@ bool StatTree<Data, Compare>::verify() const
 }
 
 template <class Data, class Compare>
+size_t StatTree<Data, Compare>::countLesser(const Node* node, const size_t m) const
+{
+  if (m <= node->Node::leftSize_)
+    return countLesser(node->left_, m);
+  else if (m > Node::leftSize_)
+  {
+    m = m - (Node::leftSize_ + 1);
+    if (Node::leftSize_ + 1 == m)
+      return node->data_;
+    else if (Node::leftSize_ + 1 < m)
+      return countLesser(node->right_, m);
+  }
+}
+
+template <class Data, class Compare>
 template <class Tester>
 bool StatTree<Data, Compare>::DFS(Tester &&tester) const
 {
