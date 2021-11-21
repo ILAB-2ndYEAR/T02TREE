@@ -101,9 +101,14 @@ public:
     }
   };
 
-  static Iterator end()
+  Iterator end() const
   {
-    return Iterator{nullptr, true};
+    Node *end = root_;
+    if (end == nullptr)
+        return Iterator{nullptr, true};
+    while (end->right_ != nullptr)
+        end = end->right_;
+    return Iterator{end, true};
   }
 
   size_t size() const noexcept
