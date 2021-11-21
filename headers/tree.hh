@@ -1,11 +1,11 @@
 
 #include <cassert>
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <ostream>
 #include <unordered_map>
 #include <utility>
-#include <fstream>
 
 #ifndef TREE_HH_INCL
 #define TREE_HH_INCL
@@ -73,21 +73,37 @@ class StatTree
   size_t size_ = 0;
 
 public:
-  struct Iterator
+  class Iterator
   {
+    friend StatTree;
+
     Node *ptr_ = nullptr;
+    bool isEnd_ = true;
 
-    Data getData() const;
+    Iterator(Node *ptr, bool isEnd) : ptr_{ptr}, isEnd_{isEnd}
+    {}
 
-    bool operator==(const Iterator &sd) const noexcept
+  public:
+    Data &operator*() const noexcept
     {
-      return ptr_ == sd.ptr_;
+      return ptr_->data_;
+    }
+
+    bool operator==(const Iterator &sd)
+    {
+      if (isEnd_ == sd.isEnd_)
+      {
+        if (isEnd_)
+          return true;
+        return ptr_ == sd.ptr_;
+      }
+      return false;
     }
   };
 
   static Iterator end()
   {
-    return Iterator{nullptr};
+    return Iterator{nullptr, true};
   }
 
   size_t size() const noexcept
@@ -140,7 +156,7 @@ private:
   // Bypasses all tree and calls tester (curNode) for all nodes.
   // Returns 'true' in case of success check (dump) and 'false' otherwise.
   template <class Tester>
-  bool DFS( Tester&& tester ) const;
+  bool DFS(Tester &&tester) const;
 
   // Used by StructTester to avoid looping.
   bool toggleValue() const noexcept
@@ -197,8 +213,8 @@ private:
   struct Dumper
   {
     unsigned long long int cout_nils;
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
     Dumper(const StatTree &tree)
     {
       cout_nils = 0;
@@ -208,7 +224,7 @@ private:
       if (out.is_open())
         out << "digraph DG {" << std::endl;
     };
-    #pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
     ~Dumper()
     {
       std::ofstream out("../tree.txt", std::ios::app);

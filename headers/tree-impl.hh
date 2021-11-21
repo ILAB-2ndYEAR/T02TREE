@@ -27,7 +27,7 @@ typename StatTree<Data, Compare>::Iterator StatTree<Data, Compare>::find(const D
   if (curNode == nullptr)
     return end();
 
-  return Iterator{curNode};
+  return Iterator{curNode, false};
 }
 
 template <class Data, class Compare>
@@ -62,7 +62,7 @@ void StatTree<Data, Compare>::rRotation(Node *x)
     y->right_->parent_ = x;
 
   if (parent == nullptr)
-      root_ = y;
+    root_ = y;
   else if (x == parent->left_)
     parent->left_ = y;
   else
@@ -310,9 +310,9 @@ typename tree::StatTree<Data, Compare>::Node tree::StatTree<Data, Compare>::inse
 template <class Data, class Compare>
 bool StatTree<Data, Compare>::verify() const
 {
-  if (!DFS<StatTree<Data, Compare>::StructTester>(StructTester {*this}))
+  if (!DFS<StatTree<Data, Compare>::StructTester>(StructTester{*this}))
     return false;
-  if (!DFS<StatTree<Data, Compare>::SizesTester>(SizesTester {*this}))
+  if (!DFS<StatTree<Data, Compare>::SizesTester>(SizesTester{*this}))
     return false;
 
   return true;
@@ -320,10 +320,10 @@ bool StatTree<Data, Compare>::verify() const
 
 template <class Data, class Compare>
 template <class Tester>
-bool StatTree<Data, Compare>::DFS( Tester&& tester ) const
+bool StatTree<Data, Compare>::DFS(Tester &&tester) const
 {
   Node *curNode = root_;
-  std::vector<bool> rightChildPassed {};
+  std::vector<bool> rightChildPassed{};
   size_t depth = 0;
 
   while (curNode != nullptr)
@@ -331,8 +331,8 @@ bool StatTree<Data, Compare>::DFS( Tester&& tester ) const
     if (!tester(curNode))
       return false;
 
-    if (depth == rightChildPassed.size ())
-        rightChildPassed.push_back (false);
+    if (depth == rightChildPassed.size())
+      rightChildPassed.push_back(false);
 
     if (curNode->left_ != nullptr)
     {
@@ -437,30 +437,62 @@ bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) noexcept
 
     if (node->right_ != nullptr)
       out << "\"" << node->data_ << "\" -> "
-          << " \"" << node->right_->data_ << "\"" << "[style=" << "\"" << "dotted" << "\"" << "];" << std::endl;
+          << " \"" << node->right_->data_ << "\""
+          << "[style="
+          << "\""
+          << "dotted"
+          << "\""
+          << "];" << std::endl;
     else
     {
       ++cout_nils;
       out << "\"" << node->data_ << "\" -> "
-          << " \"" << "nil" << cout_nils  << "\"" << "[style=" << "\"" << "dotted" << "\"" << "];" << std::endl;
-      out << "\"" << "nil" << cout_nils << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "BLACK" << "\"];" << std::endl;
+          << " \""
+          << "nil" << cout_nils << "\""
+          << "[style="
+          << "\""
+          << "dotted"
+          << "\""
+          << "];" << std::endl;
+      out << "\""
+          << "nil" << cout_nils << "\""
+          << "[style=\"filled\",fontcolor=\"white\",fillcolor="
+          << "\""
+          << "BLACK"
+          << "\"];" << std::endl;
     }
 
     if (node->left_ != nullptr)
       out << "\"" << node->data_ << "\" -> "
-          << " \"" << node->left_->data_ << "\""  << ";" << std::endl;
+          << " \"" << node->left_->data_ << "\""
+          << ";" << std::endl;
     else
     {
       ++cout_nils;
       out << "\"" << node->data_ << "\" -> "
-          << " \"" << "nil" << cout_nils  << "\""  << ";" << std::endl;
-      out << "\"" << "nil" << cout_nils << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "BLACK" << "\"];" << std::endl;
+          << " \""
+          << "nil" << cout_nils << "\""
+          << ";" << std::endl;
+      out << "\""
+          << "nil" << cout_nils << "\""
+          << "[style=\"filled\",fontcolor=\"white\",fillcolor="
+          << "\""
+          << "BLACK"
+          << "\"];" << std::endl;
     }
 
     if (node != nullptr && node->color_ == Color::RED)
-      out << "\"" << node->data_ << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "RED" << "\"];" << std::endl;
+      out << "\"" << node->data_ << "\""
+          << "[style=\"filled\",fontcolor=\"white\",fillcolor="
+          << "\""
+          << "RED"
+          << "\"];" << std::endl;
     else if (node == nullptr || node->color_ == Color::BLACK)
-      out << "\"" << node->data_ << "\"" << "[style=\"filled\",fontcolor=\"white\",fillcolor=" << "\"" << "BLACK" << "\"];" << std::endl;
+      out << "\"" << node->data_ << "\""
+          << "[style=\"filled\",fontcolor=\"white\",fillcolor="
+          << "\""
+          << "BLACK"
+          << "\"];" << std::endl;
   }
   out.close();
   return true;
@@ -469,7 +501,7 @@ bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) noexcept
 template <class Data, class Compare>
 bool StatTree<Data, Compare>::dump() const
 {
-  return DFS<tree::StatTree<int>::Dumper>(Dumper {*this});
+  return DFS<tree::StatTree<int>::Dumper>(Dumper{*this});
 }
 
 template <class Data, class Compare>
