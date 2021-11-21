@@ -78,18 +78,18 @@ public:
     friend StatTree;
 
     Node *ptr_ = nullptr;
-    bool isEnd_ = true;
+    bool isEnd_ = false;
 
     Iterator(Node *ptr, bool isEnd) : ptr_{ptr}, isEnd_{isEnd}
     {}
 
   public:
-    Data &operator*() const noexcept
+    const Data &operator*() const noexcept
     {
       return ptr_->data_;
     }
 
-    bool operator==(const Iterator &sd)
+    bool operator==(const Iterator &sd) const noexcept
     {
       if (isEnd_ == sd.isEnd_)
       {
@@ -103,7 +103,7 @@ public:
 
   Iterator end() const
   {
-    Node *end = root_;
+    const Node *end = root_;
     if (end == nullptr)
         return Iterator{nullptr, true};
     while (end->right_ != nullptr)
