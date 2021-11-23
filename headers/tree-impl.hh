@@ -209,6 +209,39 @@ void StatTree<Data, Compare>::eraseFixup(Node *toFix, Node *toFixParent)
 }
 
 template <class Data, class Compare>
+typename StatTree<Data, Compare>::Node StatTree<Data, Compare>::insert(const Data &new_data)
+{
+  Node *cur_root = nullptr;
+  Node *root = root_;
+  Node *new_node = new Node{new_data};
+
+  while (root != nullptr)
+  {
+    cur_root = root;
+    if (new_node->data_ < root->data_)
+      root = root->left_;
+    else
+      root = root->right_;
+  }
+
+  new_node->parent_ = cur_root;
+
+  if (cur_root == nullptr)
+    root_ = new_node;
+  else if (new_node->data_ < cur_root->data_)
+    cur_root->left_ = new_node;
+  else
+    cur_root->right_ = new_node;
+
+  new_node->left_ = nullptr;
+  new_node->right_ = nullptr;
+  new_node->color_ = Color::RED;
+
+  insertFixup(new_node);
+  return (*new_node);
+}
+
+template <class Data, class Compare>
 void StatTree<Data, Compare>::insertFixup(Node *node)
 {
   while (Node::getColor(node->parent_) == Color::RED)
@@ -262,51 +295,7 @@ void StatTree<Data, Compare>::insertFixup(Node *node)
 }
 
 template <class Data, class Compare>
-typename tree::StatTree<Data, Compare>::Node tree::StatTree<Data, Compare>::insert(const Data &new_data)
-{
-  Node *cur_root = nullptr;
-  Node *root = root_;
-  Node *new_node = new Node{new_data};
-
-  while (root != nullptr)
-  {
-    cur_root = root;
-    if (new_node->data_ < root->data_)
-      root = root->left_;
-    else
-      root = root->right_;
-  }
-
-  new_node->parent_ = cur_root;
-
-  if (cur_root == nullptr)
-    root_ = new_node;
-  else if (new_node->data_ < cur_root->data_)
-    cur_root->left_ = new_node;
-  else
-    cur_root->right_ = new_node;
-
-  new_node->left_ = nullptr;
-  new_node->right_ = nullptr;
-  new_node->color_ = Color::RED;
-
-  insertFixup(new_node);
-  return (*new_node);
-}
-
-template <class Data, class Compare>
-bool StatTree<Data, Compare>::verify() const
-{
-  if (!DFS<StatTree<Data, Compare>::StructTester>(StructTester{*this}))
-    return false;
-  if (!DFS<StatTree<Data, Compare>::SizesTester>(SizesTester{*this}))
-    return false;
-
-  return true;
-}
-
-template <class Data, class Compare>
-size_t StatTree<Data, Compare>::countLesser(const Node* node, const size_t m) const
+size_t StatTree<Data, Compare>::countLesser(const Node *node, const size_t m) const
 {
   if (m <= node->Node::leftSize_)
     return countLesser(node->left_, m);
@@ -367,69 +356,15 @@ bool StatTree<Data, Compare>::DFS(const Callable &callable) const
 }
 
 template <class Data, class Compare>
-bool StatTree<Data, Compare>::StructTester::operator()(Node *node) const noexcept
+bool StatTree<Data, Compare>::dump() const
 {
-  if (node->passToggle(passToggle_))
-    return false;
-
-  Node *left = node->left_;
-  Node *right = node->right_;
-
-  if (left != nullptr)
-    if (left->parent_ != node)
-      return false;
-
-  if (right != nullptr)
-    if (right->parent_ != node)
-      return false;
-
-  return ++passedNum_ <= treeSize_;
-}
-
-template <class Data, class Compare>
-bool StatTree<Data, Compare>::SizesTester::operator()(const Node *node) const noexcept
-{
-  const Node *l = node->left_;
-  const Node *r = node->right_;
-  size_t rSz = node->rightSize_;
-  size_t lSz = node->leftSize_;
-
-  if (!rootPassed_)
-  {
-    rootPassed_ = true;
-    if (treeSize_ != lSz + rSz + 1)
-      return false;
-  }
-
-  if (l == nullptr)
-  {
-    if (lSz != 0)
-      return false;
-  }
-  else
-  {
-    if (lSz != l->rightSize_ + l->leftSize_ + 1)
-      return false;
-  }
-
-  if (r == nullptr)
-  {
-    if (rSz != 0)
-      return false;
-  }
-  else
-  {
-    if (rSz != r->rightSize_ + r->leftSize_ + 1)
-      return false;
-  }
-
-  return true;
+  return DFS<tree::StatTree<Data, Compare>::Dumper>(Dumper{*this});
 }
 
 template <class Data, class Compare>
 bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) const noexcept
 {
-  std::ofstream out("../tree.txt", std::ios::app);
+  std::ofstream out("tree.txt", std::ios::app);
   if (out.is_open())
   {
     if (node == nullptr)
@@ -497,43 +432,6 @@ bool StatTree<Data, Compare>::Dumper::operator()(const Node *node) const noexcep
           << "\"];" << std::endl;
   }
   out.close();
-  return true;
-}
-
-template <class Data, class Compare>
-bool StatTree<Data, Compare>::dump() const
-{
-  return DFS<tree::StatTree<int>::Dumper>(Dumper{*this});
-}
-
-template <class Data, class Compare>
-bool StatTree<Data, Compare>::ColorsTester::operator()(const Node *node) const
-{
-  if (node == root_ && Node::getColor(node) != Color::BLACK)
-    return false;
-
-  if (Node::getColor(node) == Color::RED && Node::getColor(node->parent_) == Color::RED)
-    return false;
-
-  // Black heights check.
-  size_t blackHeight = 0;
-  if (node->left_ == nullptr && node->right_ == nullptr)
-  {
-    while (node != nullptr)
-    {
-      if (Node::getColor(node) == Color::BLACK)
-        ++blackHeight;
-
-      auto hIt = blackHeights_.find(node);
-      if (hIt == blackHeights_.end())
-        blackHeights_.emplace(node, blackHeight);
-      else if (hIt.second != blackHeight)
-        return false;
-
-      node = node->parent_;
-    }
-  }
-
   return true;
 }
 
