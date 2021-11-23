@@ -18,6 +18,8 @@ namespace tree
 template <class Data, class Compare = std::less<Data>>
 class StatTree
 {
+  friend class TreeTester;
+
   enum class Side
   {
     LEFT,
@@ -54,18 +56,6 @@ class StatTree
       if (side == Side::LEFT)
         return node->left_;
       return node->right_;
-    }
-
-    // Debug fields & methods:
-    bool passToggle_ = false;
-
-    // Checks if that node were toggled with taken treePassToggle
-    // value last time and toggles passToggle_ to do such checks in future.
-    // Used in verify passes to avoid looping.
-    bool passToggle(bool treePassToggle) noexcept
-    {
-      bool curToggleVal = passToggle_;
-      return curToggleVal == (passToggle_ = treePassToggle);
     }
   };
 
@@ -105,9 +95,9 @@ public:
   {
     Node *end = root_;
     if (end == nullptr)
-        return Iterator{nullptr, true};
+      return Iterator{nullptr, true};
     while (end->right_ != nullptr)
-        end = end->right_;
+      end = end->right_;
     return Iterator{end, true};
   }
 
@@ -149,74 +139,21 @@ private:
 
 public:
   // Methods from the KV task
-  size_t countLesser(const Node* node, const size_t m) const;
+  size_t countLesser(const Node *node, const size_t m) const;
   Data lesserOfOrderK(size_t k) const;
 
   // Calles bypass for all types of checks.
-  bool verify() const;
   bool dump() const;
 
 private:
-  // Bypasses all tree and calls tester (curNode) for all nodes.
-  // Returns 'true' in case of success check (dump) and 'false' otherwise.
+  // Passes all tree and calls callable (curNode) for all nodes.
+  // Returns 'true' in case of success pass and 'false' otherwise.
   template <class Callable>
   bool DFS(const Callable &callable) const;
 
-  // Used by StructTester to avoid looping.
-  bool toggleValue() const noexcept
-  {
-    if (root_ != nullptr)
-      return root_->passToggle_;
-    return false;
-  }
-
-  // Callables for bypass
-  // Checks that StatTree have binary tree structure.
-  struct StructTester
-  {
-    const size_t treeSize_;
-    const bool passToggle_;
-    mutable size_t passedNum_ = 0;
-
-    StructTester(const StatTree &tree) : treeSize_{tree.size()}, passToggle_{tree.toggleValue()}
-    {}
-
-    bool operator()(Node *) const noexcept;
-  };
-
-  // Checks that all sizes are counted correctly.
-  struct SizesTester
-  {
-    mutable bool rootPassed_ = false;
-    const size_t treeSize_;
-
-    SizesTester(const StatTree &tree) : treeSize_{tree.size()}
-    {}
-
-    bool operator()(const Node *node) const noexcept;
-  };
-
-  // Checks that tree is ordered correctly.
-  struct SortedOrderTester
-  {
-    mutable bool sorted_order = false;
-
-    SortedOrderTester(const StatTree &tree) : sorted_order{tree.bypass()}
-    {}
-
-    bool operator()(const Node *node) const noexcept;
-  };
-
-  struct ColorsTester
-  {
-    mutable std::unordered_map<Node *, size_t> blackHeights_{};
-
-    bool operator()(const Node *node) const;
-  };
-
   struct Dumper
   {
-    mutable unsigned long long int cout_nils;
+    mutable size_t cout_nils;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
     Dumper(const StatTree &tree)
@@ -224,14 +161,14 @@ private:
       cout_nils = 0;
 
       std::ofstream out;
-      out.open("../tree.txt");
+      out.open("tree.txt");
       if (out.is_open())
         out << "digraph DG {" << std::endl;
     };
 #pragma GCC diagnostic pop
     ~Dumper()
     {
-      std::ofstream out("../tree.txt", std::ios::app);
+      std::ofstream out("tree.txt", std::ios::app);
       if (out.is_open())
         out << "}" << std::endl;
     }
